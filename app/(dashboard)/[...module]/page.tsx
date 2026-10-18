@@ -14,9 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Suspense } from "react";
 
-export default async function ModulePage({
-  params,
-}: PageProps<"/[...module]">) {
+async function ModuleContent({ params }: PageProps<"/[...module]">) {
   await connection();
   const admin = await requireAdmin();
   const { module } = await params;
@@ -29,37 +27,54 @@ export default async function ModulePage({
       item.href.startsWith(`${pathname}/`) && canAccess(item, admin.role),
   );
   return (
-    <Suspense>
-      <div className="space-y-8">
-        <div className="space-y-2">
-          <p className="text-label-caps text-muted-foreground uppercase">
-            Workspace admin
-          </p>
-          <h1 className="font-display text-headline-lg">{page.label}</h1>
-        </div>
-        <Card>
-          <CardHeader className="gap-3">
-            <Badge className="self-start" variant="secondary">
-              Belum tersedia
-            </Badge>
-            <CardTitle>Modul {page.label}</CardTitle>
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <p className="text-label-caps text-muted-foreground uppercase">
+          Workspace admin
+        </p>
+        <h1 className="font-display text-headline-lg">{page.label}</h1>
+      </div>
+      <Card>
+        <CardHeader className="gap-3">
+          <Badge className="self-start" variant="secondary">
+            Belum tersedia
+          </Badge>
+          <CardTitle>Modul {page.label}</CardTitle>
+          <CardDescription>
+            Fitur modul ini akan tersedia pada story berikutnya. Gunakan
+            navigasi untuk berpindah ke modul lain.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          {children.map((item) => (
+            <Button key={item.href} asChild variant="secondary">
+              <Link href={item.href}>{item.label}</Link>
+            </Button>
+          ))}
+          <Button asChild variant="ghost">
+            <Link href="/">Kembali ke dashboard</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default function ModulePage(props: PageProps<"/[...module]">) {
+  return (
+    <Suspense
+      fallback={
+        <Card role="status" aria-live="polite">
+          <CardHeader>
+            <CardTitle>Memuat modul…</CardTitle>
             <CardDescription>
-              Fitur modul ini akan tersedia pada story berikutnya. Gunakan
-              navigasi untuk berpindah ke modul lain.
+              Menyiapkan halaman sesuai akses admin Anda.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            {children.map((item) => (
-              <Button key={item.href} asChild variant="secondary">
-                <Link href={item.href}>{item.label}</Link>
-              </Button>
-            ))}
-            <Button asChild variant="ghost">
-              <Link href="/">Kembali ke dashboard</Link>
-            </Button>
-          </CardContent>
         </Card>
-      </div>
+      }
+    >
+      <ModuleContent {...props} />
     </Suspense>
   );
 }
