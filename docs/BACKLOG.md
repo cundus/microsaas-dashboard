@@ -113,24 +113,50 @@ Komponen owned shadcn: Button (dipertahankan), Card, Badge, Input, Select, dan D
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-016 | Init Supabase project dan setup local dev (`supabase start`) | 1 | ☐ |
-| T-017 | Buat migration: tabel `microsaas` | 1 | ☐ |
-| T-018 | Buat migration: tabel `admin_users` dan `admin_roles` | 2 | ☐ |
-| T-019 | Buat migration: tabel `users` (agregat dari semua MicroSaaS) | 2 | ☐ |
-| T-020 | Buat migration: tabel `subscriptions`, `plans` | 2 | ☐ |
-| T-021 | Buat migration: tabel `transactions`, `invoices` | 2 | ☐ |
-| T-022 | Buat migration: tabel `payment_gateways`, `promo_codes` | 2 | ☐ |
-| T-023 | Buat migration: tabel `performance_metrics`, `audit_logs` | 2 | ☐ |
-| T-024 | Buat migration: tabel `alert_rules`, `alert_logs` | 1 | ☐ |
-| T-025 | Buat migration: tabel `admin_assignments` (operator per MicroSaaS) | 1 | ☐ |
-| T-026 | Definisikan RLS policy: Super Admin akses penuh berbasis role; audit append-only | 3 | ☐ |
-| T-027 | Definisikan RLS policy: Operator Admin — scoped ke MicroSaaS | 3 | ☐ |
-| T-028 | Definisikan RLS policy: Finance Admin — read-only revenue tables | 2 | ☐ |
-| T-029 | Setup Supabase client di Next.js (server + browser + middleware) | 2 | ☐ |
-| T-030 | Buat seed script dengan dummy data (3 MicroSaaS, 50 users, dll.) | 3 | ☐ |
-| T-031 | Generate TypeScript types dari Supabase schema | 1 | ☐ |
+| T-016 | Init Supabase config dan verifikasi koneksi cloud (tanpa Docker, sesuai instruksi pengguna) | 1 | ✅ |
+| T-017 | Buat migration: tabel `microsaas` | 1 | ✅ |
+| T-018 | Buat migration: tabel `admin_users` dan `admin_roles` | 2 | ✅ |
+| T-019 | Buat migration: tabel `users` (agregat dari semua MicroSaaS) | 2 | ✅ |
+| T-020 | Buat migration: tabel `subscriptions`, `plans` | 2 | ✅ |
+| T-021 | Buat migration: tabel `transactions`, `invoices` | 2 | ✅ |
+| T-022 | Buat migration: tabel `payment_gateways`, `promo_codes` | 2 | ✅ |
+| T-023 | Buat migration: tabel `performance_metrics`, `audit_logs` | 2 | ✅ |
+| T-024 | Buat migration: tabel `alert_rules`, `alert_logs` | 1 | ✅ |
+| T-025 | Buat migration: tabel `admin_assignments` (operator per MicroSaaS) | 1 | ✅ |
+| T-026 | Definisikan RLS policy: Super Admin akses penuh berbasis role; audit append-only | 3 | ✅ |
+| T-027 | Definisikan RLS policy: Operator Admin — scoped ke MicroSaaS | 3 | ✅ |
+| T-028 | Definisikan RLS policy: Finance Admin — read-only revenue tables | 2 | ✅ |
+| T-029 | Setup Supabase client di Next.js (server + browser + middleware) | 2 | ✅ |
+| T-030 | Buat seed script dengan dummy data (3 MicroSaaS, 50 users, dll.) | 3 | ✅ |
+| T-031 | Generate TypeScript types dari Supabase schema | 1 | ✅ |
 
 **Total SP: 30**
+
+**Status: ✅ Selesai.** T-016–T-031 selesai. Sesuai instruksi pengguna, memakai
+project cloud `SDSKanban` (`nbcgglhxqtgewtoeqbnf`) tanpa Supabase lokal/Docker.
+CLI config, migration 16 tabel public plus tabel private
+untuk ciphertext gateway, RLS tiga role, audit otomatis append-only, seed sintetis
+3 produk/50 users, client browser/server, dan refresh session via Next.js 16
+`proxy.ts` tersedia. Relasi `plan_microsaas` mendukung plan lintas produk; FK gabungan
+mencegah relasi user/subscription/transaksi/invoice lintas scope.
+
+**Verifikasi cloud:** pengguna mengonfirmasi project SDSKanban meskipun tersedia
+project lain bernama microsaas. CLI terhubung, dry-run hanya menemukan migration
+foundation, lalu migration `20261018000100_foundation.sql` berhasil diterapkan.
+Seluruh 16 tabel dashboard memiliki RLS aktif beserta policy. Akses anonim melalui
+PostgREST ke microsaas/users/audit_logs ditolak (HTTP 401, PostgreSQL 42501).
+Dry-run ulang menyatakan remote up to date. Tipe resmi digenerate CLI dari schema
+public cloud; generator juga memformat output. `.env.local` yang diabaikan Git
+berisi URL dan public anon key, tanpa service-role key.
+
+Project juga berisi tabel Kanban/budgeting; tabel lama tidak diubah. Seed dummy
+tidak diterapkan ke cloud dan tidak membuat akun Auth/admin. Seed asli diuji di
+PostgreSQL embedded. Login UI, bootstrap admin, dan proteksi route mengikuti STORY-004;
+pengujian session pengguna nyata menunggu implementasi login.
+
+**Verifikasi repo:** `pnpm test:db` (8 checks, termasuk parent test), lint,
+format check, typecheck, dan production build lolos. Tidak ada container Supabase
+yang dijalankan.
 
 ---
 

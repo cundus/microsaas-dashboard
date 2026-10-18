@@ -21,8 +21,8 @@ Copy-Item .env.local.example .env.local
 pnpm dev
 ```
 
-Buka <http://localhost:3000>. Halaman masih starter; integrasi Supabase dan fitur
-bisnis mengikuti backlog. Environment boleh kosong sampai modul terkait dibangun.
+Buka <http://localhost:3000>. Halaman utama masih starter; preview UI ada di
+`/design-system`. Client Supabase tersedia; fitur bisnis mengikuti backlog.
 
 ## Environment
 
@@ -34,7 +34,90 @@ bisnis mengikuti backlog. Environment boleh kosong sampai modul terkait dibangun
 | `GATEWAY_ENCRYPTION_KEY`        | Server saja    | Dicadangkan untuk enkripsi secret gateway: 32 byte acak dalam base64 |
 
 Jangan commit `.env.local`. Service role dan kunci enkripsi tidak boleh dikirim ke
-browser. Belum ada pembacaan atau validasi runtime environment pada fondasi ini.
+browser. Client memvalidasi URL/key ketika dipanggil. Proxy hanya refresh session
+jika kedua public environment terisi; preview UI tetap dapat dibuka tanpa key.
+Proteksi route, login, dan pemeriksaan role di Server Action mengikuti story 4/32.
+
+## Supabase cloud (story 3)
+
+Project tujuan: `nbcgglhxqtgewtoeqbnf` di
+<https://nbcgglhxqtgewtoeqbnf.supabase.co>. Workflow ini tidak memakai Docker.
+Project ini bernama `SDSKanban` dan juga berisi tabel Kanban/budgeting. Migration
+`20261018000100_foundation.sql` sudah diterapkan ke cloud; RLS seluruh 16 tabel
+dashboard diverifikasi aktif dan akses anonim melalui PostgREST ditolak.
+Tabel aplikasi lama tidak diubah. Seed dummy belum diterapkan ke cloud.
+Tidak ada service-role client yang melewati RLS.
+
+Migration ada di `supabase/migrations/`, seed di `supabase/seed.sql`. Skema berisi
+16 tabel public, termasuk relasi `plan_microsaas` agar satu plan bisa dipakai
+beberapa produk. Foreign key gabungan menjaga user/subscription/transaksi/invoice
+tetap di produk yang sama. Nilai uang memakai `numeric(14,2)` dan currency eksplisit.
+Subscription menyimpan snapshot harga untuk mempertahankan harga pelanggan lama.
+
+| Role                       | Akses database                                                                                                                                |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Super Admin                | CRUD tabel dashboard; audit hanya baca                                                                                                        |
+| Operator Admin             | Baca produk yang di-assign, users, plans, subscriptions, transaksi, invoice, metrik, promo, dan alert; update users/subscriptions dalam scope |
+| Finance Admin              | Baca subscriptions, transactions, invoices, serta metadata produk/plan/gateway; tanpa mutasi, profil user, atau secret                        |
+| Non-admin / admin nonaktif | Tidak memiliki akses data bisnis                                                                                                              |
+
+Kredensial gateway dipisah ke `private.payment_gateway_secrets`, di luar Data API.
+Hanya operasi server istimewa boleh mengakses ciphertext setelah pemeriksaan izin;
+enkripsi dan pengelolaan secret diimplementasikan pada story payment. Metadata
+gateway dan alert tidak boleh berisi token atau webhook rahasia. RLS memakai role
+admin aktif dari database, bukan `user_metadata` JWT. Audit otomatis mencatat
+mutasi admin dan menolak update/delete/truncate, termasuk oleh Super Admin.
+Mutasi backend dengan service role wajib menyertakan audit eksplisit di story fitur.
+Hard delete produk yang sudah memiliki data keuangan ditolak foreign key; gunakan
+status `inactive` untuk mempertahankan histori.
+
+Client browser: `lib/supabase/client.ts`; client server per request:
+`lib/supabase/server.ts`. `proxy.ts` memakai konvensi Next.js 16 untuk refresh
+cookie melalui `getClaims()` dan mencegah caching respons yang menulis session.
+Pola mengikuti [panduan SSR Supabase](https://supabase.com/docs/guides/auth/server-side/creating-a-client).
+
+Setelah akses CLI tersedia dan perubahan cloud disetujui, gunakan workflow ini:
+
+```sh
+pnpm exec supabase login
+pnpm exec supabase link --project-ref nbcgglhxqtgewtoeqbnf
+pnpm exec supabase db push --linked --dry-run
+# Periksa migration dan pastikan project tujuan sebelum menjalankan push.
+pnpm exec supabase db push --linked
+pnpm db:types
+```
+
+Jangan menerapkan baseline ini langsung ke project yang sudah mempunyai tabel
+bernama sama; tarik dan rekonsiliasi schema terlebih dahulu. Ambil public anon key
+dari Supabase Connect dan isi `.env.local` bersama URL project. Jangan commit key.
+Bootstrap admin pertama melalui SQL Editor setelah membuat/mengundang akun Auth:
+
+```sql
+insert into public.admin_users (id, role_id, name)
+select id, 'super_admin', 'Admin Utama'
+from auth.users where email = 'GANTI_DENGAN_EMAIL_ADMIN';
+```
+
+Seed bersifat sintetis dan idempotent: 3 produk, 50 users, 50 subscriptions,
+50 transaksi/invoice, 90 metrik harian, promo, gateway sandbox tanpa secret,
+dan alert contoh. Seed tidak membuat akun Auth atau memberi role admin.
+Jalankan `supabase/seed.sql` melalui SQL Editor **hanya pada project development**;
+`db push` di atas tidak menyertakan seed. Jangan menjalankan `db reset` ke cloud.
+
+```sh
+pnpm test:db
+```
+
+Pengujian database memakai PostgreSQL embedded (PGlite), tanpa container atau
+koneksi cloud. Migrations dan seed asli dijalankan; hanya interface identitas
+Supabase Auth yang dibuat sebagai stub. Pengujian meliputi isolasi RLS, eskalasi
+role, pencabutan akses, append-only audit, scope FK, dan constraint billing.
+PostgREST cloud sudah diuji untuk penolakan akses anonim. Pengujian login dan
+refresh session pengguna nyata mengikuti story 4.
+`types/database.ts` dihasilkan CLI dari schema public cloud; karena project dipakai
+bersama, file ini juga berisi tipe tabel aplikasi lama. `pnpm db:types` memperbarui
+dan memformat file tersebut dari cloud.
+Kegagalan generate tidak menimpa file types yang sudah ada.
 
 ## Tooling dan verifikasi
 

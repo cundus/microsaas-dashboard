@@ -9,3 +9,5 @@ docs/
 DESIGN.md
 .env*
 .husky/_/
+supabase/.temp/
+supabase/.branches/

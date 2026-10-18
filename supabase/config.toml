@@ -1,0 +1,13 @@
+# CLI configuration for versioned migrations. No local stack is required.
+project_id = "dashboard-saas"
+
+[db]
+major_version = 17
+
+[db.migrations]
+enabled = true
+schema_paths = []
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
