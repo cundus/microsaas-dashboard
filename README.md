@@ -354,6 +354,49 @@ preset/custom, agregasi, grafik nonzero/tooltip keyboard memakai fixture di stat
 browser, serta kegagalan/pemulihan koneksi. Fixture tidak ditulis ke cloud;
 verifikasi data pengguna nyata dan review visual pengguna masih diperlukan.
 
+Story 10 menambahkan Aktivitas terbaru (20 item) di bawah grafik pengguna.
+Setiap item memiliki ikon/jenis, produk, deskripsi, timestamp WIB, dan link.
+Link pengguna/subscription/performa menuju modul yang masih placeholder dengan
+filter resource di query string; detail fitur modul mengikuti story berikutnya.
+Audit menuju detail produk. Super Admin melihat semua aktivitas, Operator hanya
+produk assignment, dan Finance hanya upgrade/churn.
+
+Tabel `dashboard_activity` menyimpan projection tersanitasi dari sumber bisnis.
+Trigger mencatat signup pada insert pengguna, upgrade saat MRR subscription
+active naik dalam mata uang sama (tahunan /12), dan churn saat status beralih
+ke canceled/expired. Perubahan integrasi tanpa JWT admin tetap tercatat.
+Error spike adalah crossing error rate >=5% pada sampel minimal 20 request
+per endpoint; sampel tinggi berurutan tidak menghasilkan spam hingga ada sampel
+di bawah ambang. Masukkan sampel secara kronologis; koreksi/update atau backfill
+metrik lama tidak merekonsiliasi episode yang sudah dicatat. Ambang baseline ini
+terpisah dari evaluator alert rules yang belum tersedia.
+
+Audit feed memakai allowlist event per produk untuk gateway, promo, alert rule,
+serta registry dengan scope tercatat. Email/nama pengguna, raw metadata audit,
+dan URL endpoint tidak disalin ke projection. Klien hanya dapat membaca event;
+RLS yang sama berlaku untuk RPC maupun Realtime. Histori saat migrasi diisi dari
+data sumber dan audit yang tersedia. Churn lama tanpa audit memakai canceled_at
+atau updated_at; upgrade tanpa audit historis tidak bisa dipulihkan. Penghapusan
+produk menghapus projection produk tersebut melalui FK cascade.
+
+Klien berlangganan INSERT menggunakan
+[Supabase Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes)
+pada tabel projection saja, lalu memuat ulang daftar melalui Server Action.
+Notifikasi digabung per 200 ms, sehingga payload Realtime tidak digabung langsung
+ke state. Subscribe/reconnect juga memuat ulang daftar. Saat WebSocket terputus,
+refresh fallback berjalan tiap satu menit; online/focus dan tombol Refresh
+aktivitas dapat memulihkan data. Error tetap mempertahankan data terakhir.
+Unmount membersihkan channel, listener, dan timer.
+
+Jalankan `pnpm test:activity` untuk trigger, backfill historis, normalisasi harga,
+crossing error spike, deduplikasi, limit, link, RLS seluruh role, larangan mutasi
+event, dan publikasi. Migration cloud sudah diterapkan dan tipe resmi digenerate
+ulang. Browser memverifikasi handshake Live, empty state, lima jenis item melalui
+fixture state, pemulihan koneksi, dan frame INSERT simulasi yang memicu fetch
+baru. Frame simulasi tidak membuktikan pengiriman event bisnis nyata dari cloud;
+verifikasi tersebut menunggu data bisnis tersedia. Tidak menambahkan fixture ke
+cloud. Review visual pengguna masih diperlukan.
+
 Build dapat dijalankan tanpa menyentuh output dev yang sedang aktif:
 `$env:NEXT_DIST_DIR = 'build'; pnpm build` pada PowerShell. Gunakan nilai yang
 sama ketika menjalankan `pnpm start`, lalu hapus environment tersebut sebelum

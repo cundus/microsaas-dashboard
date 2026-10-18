@@ -484,11 +484,55 @@ Verifikasi data pengguna nyata dan review visual pengguna masih diperlukan.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-060 | Buat query `getRecentActivity(limit)` dari signup, perubahan subscription, metrik error, dan audit admin yang relevan | 2 | ☐ |
-| T-061 | Buat komponen `ActivityFeed` dengan item list | 2 | ☐ |
-| T-062 | Subscribe ke Supabase Realtime channel untuk live updates | 3 | ☐ |
+| T-060 | Buat query `getRecentActivity(limit)` dari signup, perubahan subscription, metrik error, dan audit admin yang relevan | 2 | ✅ |
+| T-061 | Buat komponen `ActivityFeed` dengan item list | 2 | ✅ |
+| T-062 | Subscribe ke Supabase Realtime channel untuk live updates | 3 | ✅ |
 
 **Total SP: 7**
+
+**Status: implementasi selesai; menunggu review visual pengguna (2026-10-19).**
+Feed menampilkan 20 aktivitas terakhir, ikon/jenis, produk, deskripsi, timestamp
+WIB, dan link ke modul terkait. Modul pengguna/subscription/performa masih
+placeholder story berikutnya; link membawa filter resource melalui query string,
+sementara audit menuju detail produk. Skeleton, empty state, refresh manual,
+error/retry dengan data terakhir, serta status koneksi tersedia.
+
+Migration `20261019000400_activity_feed.sql` menambahkan projection tersanitasi
+`dashboard_activity`, trigger sumber, RPC invoker-rights `get_recent_activity`,
+RLS, dan publikasi Realtime untuk tabel baru saja. Signup berasal dari insert
+pengguna; upgrade adalah kenaikan MRR subscription active dalam mata uang sama
+(harga tahunan /12); churn adalah transisi ke canceled/expired. Trigger bisnis
+tetap bekerja untuk integrasi tanpa JWT admin. Error spike memakai crossing
+error rate >=5% dengan minimal 20 request per sampel endpoint, dan baru berulang
+setelah sampel turun lagi. Baseline ini belum evaluator alert rules; metrik
+sebaiknya dimasukkan berurutan berdasarkan `recorded_at`. Audit hanya allowlist
+per produk: gateway, promo, alert rule, serta registry dengan scope tercatat;
+event bisnis tidak diduplikasi sebagai aktivitas admin.
+
+Histori saat migrasi diisi dari signup, subscription berhenti, upgrade/churn
+dalam audit yang tersedia, metrik, dan audit allowlist. Churn tanpa histori
+memakai canceled_at atau updated_at; upgrade lama tanpa audit tidak dipulihkan.
+Projection tidak menyimpan email/nama pengguna, metadata audit, atau URL endpoint
+yang mungkin mengandung secret. Super Admin membaca semua, Operator hanya
+assignment, Finance hanya upgrade/churn. Klien tidak dapat menulis event.
+
+Subscriber Postgres Changes memicu fetch ulang yang dibatasi per 200 ms;
+subscribe/reconnect memuat ulang untuk menutup celah event. Fallback refresh
+tiap satu menit saat WebSocket terputus, pemulihan online/focus, dan cleanup
+channel/timer tersedia. Migration diterapkan ke cloud SDSKanban, publikasi lain
+dipertahankan, dan tipe resmi digenerate ulang. Tidak menambahkan data contoh
+ke cloud.
+
+**Verifikasi:** `pnpm test:activity` (11 checks) serta seluruh regresi (61 checks
+total), lint, typecheck, format check, dan production build lolos. Browser
+memverifikasi handshake subscription cloud berstatus Live, empty state, lima
+jenis item melalui fixture state sementara, link, timestamp, error/data terakhir,
+dan refresh pemulihan. Frame INSERT simulasi pada socket membuktikan handler
+memicu request Server Action baru; trigger sumber/backfill dan RLS diuji di
+PostgreSQL embedded. Layout desktop 1280px tanpa overflow, Next.js MCP tanpa
+error kompilasi/runtime. Pengiriman event bisnis cloud dari perubahan data nyata
+dan review visual pengguna belum diverifikasi karena cloud belum berisi data
+bisnis; fixture tidak ditulis ke cloud.
 
 ---
 

@@ -3,6 +3,7 @@
 import { requireAdmin } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 import type { KPI } from "./kpis";
+import type { Activity } from "./activity";
 import type { UserGrowthRange, UserGrowthPoint } from "./user-growth";
 import { groupMicroSaaS, type MicroSaaSSummary } from "./microsaas";
 import {
@@ -10,6 +11,26 @@ import {
   type RevenueRange,
   type RevenuePoint,
 } from "./revenue";
+
+export async function getRecentActivity(
+  limit = 20,
+): Promise<
+  { data: Activity[]; error?: never } | { data?: never; error: string }
+> {
+  await requireAdmin();
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100)
+    return { error: "Jumlah aktivitas harus berupa bilangan bulat 1–100." };
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("get_recent_activity", {
+      p_limit: limit,
+    });
+    if (error) throw error;
+    return { data };
+  } catch {
+    return { error: "Aktivitas gagal dimuat. Silakan coba lagi." };
+  }
+}
 
 export async function getUserGrowthTimeSeries(
   range: UserGrowthRange,

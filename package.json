@@ -17,6 +17,7 @@
     "test:microsaas": "node --test tests/microsaas.test.mjs",
     "test:revenue": "node --test tests/revenue.test.mjs",
     "test:user-growth": "node --test tests/user-growth.test.mjs",
+    "test:activity": "node --test tests/activity.test.mjs",
     "db:types": "node scripts/generate-db-types.mjs",
     "prepare": "husky"
   },

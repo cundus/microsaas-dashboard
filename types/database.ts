@@ -562,6 +562,44 @@ export type Database = {
           },
         ];
       };
+      dashboard_activity: {
+        Row: {
+          description: string;
+          id: number;
+          kind: string;
+          microsaas_id: string;
+          occurred_at: string;
+          resource_id: string;
+          source_key: string;
+        };
+        Insert: {
+          description: string;
+          id?: never;
+          kind: string;
+          microsaas_id: string;
+          occurred_at: string;
+          resource_id: string;
+          source_key: string;
+        };
+        Update: {
+          description?: string;
+          id?: never;
+          kind?: string;
+          microsaas_id?: string;
+          occurred_at?: string;
+          resource_id?: string;
+          source_key?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_activity_microsaas_id_fkey";
+            columns: ["microsaas_id"];
+            isOneToOne: false;
+            referencedRelation: "microsaas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invoices: {
         Row: {
           amount: number;
@@ -1493,6 +1531,19 @@ export type Database = {
           status: string;
           uptime_percent: number;
           user_count: number;
+        }[];
+      };
+      get_recent_activity: {
+        Args: { p_limit?: number };
+        Returns: {
+          description: string;
+          id: number;
+          kind: string;
+          microsaas_id: string;
+          occurred_at: string;
+          product_name: string;
+          product_slug: string;
+          resource_id: string;
         }[];
       };
       get_revenue_time_series: {

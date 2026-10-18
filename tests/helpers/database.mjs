@@ -2,7 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 
 // Supabase Auth owns these objects in cloud. Only its identity interface is stubbed here.
-export async function createDatabase() {
+export async function createDatabase({ beforeMigration } = {}) {
   const db = new PGlite();
   await db.exec(`
     create role anon nologin;
@@ -18,6 +18,7 @@ export async function createDatabase() {
   const migrations = new URL("../../supabase/migrations/", import.meta.url);
   for (const file of (await readdir(migrations)).sort()) {
     if (file.endsWith(".sql")) {
+      await beforeMigration?.(db, file);
       await db.exec(await readFile(new URL(file, migrations), "utf8"));
     }
   }
