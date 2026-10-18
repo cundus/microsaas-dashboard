@@ -5,6 +5,53 @@
 
 :root {
   color-scheme: dark;
+  --kinetic-surface: #0f131c;
+  --kinetic-surface-dim: #0f131c;
+  --kinetic-surface-bright: #353943;
+  --kinetic-surface-container-lowest: #0a0e17;
+  --kinetic-surface-container-low: #181b25;
+  --kinetic-surface-container: #1c1f29;
+  --kinetic-surface-container-high: #262a34;
+  --kinetic-surface-container-highest: #31353f;
+  --kinetic-on-surface: #dfe2ef;
+  --kinetic-on-surface-variant: #b9cacb;
+  --kinetic-inverse-surface: #dfe2ef;
+  --kinetic-inverse-on-surface: #2c303a;
+  --kinetic-outline: #849495;
+  --kinetic-outline-variant: #3a494b;
+  --kinetic-surface-tint: #00dce6;
+  --kinetic-primary: #e0fdff;
+  --kinetic-on-primary: #00373a;
+  --kinetic-primary-container: #00f2fe;
+  --kinetic-on-primary-container: #006a70;
+  --kinetic-inverse-primary: #00696f;
+  --kinetic-secondary: #c0c1ff;
+  --kinetic-on-secondary: #1000a9;
+  --kinetic-secondary-container: #3131c0;
+  --kinetic-on-secondary-container: #b0b2ff;
+  --kinetic-tertiary: #e1ffec;
+  --kinetic-on-tertiary: #003824;
+  --kinetic-tertiary-container: #67f4b7;
+  --kinetic-on-tertiary-container: #006e4b;
+  --kinetic-error: #ffb4ab;
+  --kinetic-on-error: #690005;
+  --kinetic-error-container: #93000a;
+  --kinetic-on-error-container: #ffdad6;
+  --kinetic-primary-fixed: #6ff6ff;
+  --kinetic-primary-fixed-dim: #00dce6;
+  --kinetic-on-primary-fixed: #002022;
+  --kinetic-on-primary-fixed-variant: #004f53;
+  --kinetic-secondary-fixed: #e1e0ff;
+  --kinetic-secondary-fixed-dim: #c0c1ff;
+  --kinetic-on-secondary-fixed: #07006c;
+  --kinetic-on-secondary-fixed-variant: #2f2ebe;
+  --kinetic-tertiary-fixed: #6ffbbe;
+  --kinetic-tertiary-fixed-dim: #4edea3;
+  --kinetic-on-tertiary-fixed: #002113;
+  --kinetic-on-tertiary-fixed-variant: #005236;
+  --kinetic-background: #0f131c;
+  --kinetic-on-background: #dfe2ef;
+  --kinetic-surface-variant: #31353f;
   --background: #0f131c;
   --foreground: #dfe2ef;
   --card: #1c1f29;
@@ -29,6 +76,63 @@
 }
 
 @theme inline {
+  --color-kinetic-surface: var(--kinetic-surface);
+  --color-kinetic-surface-dim: var(--kinetic-surface-dim);
+  --color-kinetic-surface-bright: var(--kinetic-surface-bright);
+  --color-kinetic-surface-container-lowest: var(
+    --kinetic-surface-container-lowest
+  );
+  --color-kinetic-surface-container-low: var(--kinetic-surface-container-low);
+  --color-kinetic-surface-container: var(--kinetic-surface-container);
+  --color-kinetic-surface-container-high: var(--kinetic-surface-container-high);
+  --color-kinetic-surface-container-highest: var(
+    --kinetic-surface-container-highest
+  );
+  --color-kinetic-on-surface: var(--kinetic-on-surface);
+  --color-kinetic-on-surface-variant: var(--kinetic-on-surface-variant);
+  --color-kinetic-inverse-surface: var(--kinetic-inverse-surface);
+  --color-kinetic-inverse-on-surface: var(--kinetic-inverse-on-surface);
+  --color-kinetic-outline: var(--kinetic-outline);
+  --color-kinetic-outline-variant: var(--kinetic-outline-variant);
+  --color-kinetic-surface-tint: var(--kinetic-surface-tint);
+  --color-kinetic-primary: var(--kinetic-primary);
+  --color-kinetic-on-primary: var(--kinetic-on-primary);
+  --color-kinetic-primary-container: var(--kinetic-primary-container);
+  --color-kinetic-on-primary-container: var(--kinetic-on-primary-container);
+  --color-kinetic-inverse-primary: var(--kinetic-inverse-primary);
+  --color-kinetic-secondary: var(--kinetic-secondary);
+  --color-kinetic-on-secondary: var(--kinetic-on-secondary);
+  --color-kinetic-secondary-container: var(--kinetic-secondary-container);
+  --color-kinetic-on-secondary-container: var(--kinetic-on-secondary-container);
+  --color-kinetic-tertiary: var(--kinetic-tertiary);
+  --color-kinetic-on-tertiary: var(--kinetic-on-tertiary);
+  --color-kinetic-tertiary-container: var(--kinetic-tertiary-container);
+  --color-kinetic-on-tertiary-container: var(--kinetic-on-tertiary-container);
+  --color-kinetic-error: var(--kinetic-error);
+  --color-kinetic-on-error: var(--kinetic-on-error);
+  --color-kinetic-error-container: var(--kinetic-error-container);
+  --color-kinetic-on-error-container: var(--kinetic-on-error-container);
+  --color-kinetic-primary-fixed: var(--kinetic-primary-fixed);
+  --color-kinetic-primary-fixed-dim: var(--kinetic-primary-fixed-dim);
+  --color-kinetic-on-primary-fixed: var(--kinetic-on-primary-fixed);
+  --color-kinetic-on-primary-fixed-variant: var(
+    --kinetic-on-primary-fixed-variant
+  );
+  --color-kinetic-secondary-fixed: var(--kinetic-secondary-fixed);
+  --color-kinetic-secondary-fixed-dim: var(--kinetic-secondary-fixed-dim);
+  --color-kinetic-on-secondary-fixed: var(--kinetic-on-secondary-fixed);
+  --color-kinetic-on-secondary-fixed-variant: var(
+    --kinetic-on-secondary-fixed-variant
+  );
+  --color-kinetic-tertiary-fixed: var(--kinetic-tertiary-fixed);
+  --color-kinetic-tertiary-fixed-dim: var(--kinetic-tertiary-fixed-dim);
+  --color-kinetic-on-tertiary-fixed: var(--kinetic-on-tertiary-fixed);
+  --color-kinetic-on-tertiary-fixed-variant: var(
+    --kinetic-on-tertiary-fixed-variant
+  );
+  --color-kinetic-background: var(--kinetic-background);
+  --color-kinetic-on-background: var(--kinetic-on-background);
+  --color-kinetic-surface-variant: var(--kinetic-surface-variant);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -53,11 +157,60 @@
   --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
   --font-display: var(--font-jakarta), Arial, Helvetica, sans-serif;
   --font-mono: var(--font-jetbrains), monospace;
+  --radius: 0.5rem;
+  --radius-full: 9999px;
+  --spacing-gutter: 0.75rem;
+  --spacing-margin: 1rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 0.75rem;
+  --spacing-space-lg: 1.25rem;
+  --spacing-space-xl: 2rem;
   --radius-sm: 0.25rem;
   --radius-md: 0.75rem;
   --radius-control: 0.5rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
+  --text-display-hero: 36px;
+  --text-display-hero--line-height: 44px;
+  --text-display-hero--font-weight: 800;
+  --text-display-hero--letter-spacing: -0.03em;
+  --text-headline-lg: 28px;
+  --text-headline-lg--line-height: 34px;
+  --text-headline-lg--font-weight: 700;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-md: 22px;
+  --text-headline-md--line-height: 28px;
+  --text-headline-md--font-weight: 700;
+  --text-headline-md--letter-spacing: -0.015em;
+  --text-headline-sm: 18px;
+  --text-headline-sm--line-height: 24px;
+  --text-headline-sm--font-weight: 600;
+  --text-headline-sm--letter-spacing: -0.01em;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-body-lg--font-weight: 400;
+  --text-body-lg--letter-spacing: -0.01em;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+  --text-body-md--font-weight: 400;
+  --text-body-md--letter-spacing: -0.005em;
+  --text-body-sm: 12px;
+  --text-body-sm--line-height: 16px;
+  --text-body-sm--font-weight: 400;
+  --text-body-sm--letter-spacing: 0em;
+  --text-label-numeric: 13px;
+  --text-label-numeric--line-height: 18px;
+  --text-label-numeric--font-weight: 600;
+  --text-label-numeric--letter-spacing: -0.02em;
+  --text-label-caps: 11px;
+  --text-label-caps--line-height: 14px;
+  --text-label-caps--font-weight: 600;
+  --text-label-caps--letter-spacing: 0.06em;
+  --text-metric-stat: 30px;
+  --text-metric-stat--line-height: 36px;
+  --text-metric-stat--font-weight: 800;
+  --text-metric-stat--letter-spacing: -0.025em;
 }
 
 @layer base {
@@ -67,5 +220,26 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@utility glass-panel {
+  background:
+    linear-gradient(rgb(28 31 41 / 65%), rgb(28 31 41 / 65%)) padding-box,
+    linear-gradient(180deg, rgb(255 255 255 / 15%), rgb(255 255 255 / 2%))
+      border-box;
+  border: 1px solid transparent;
+  backdrop-filter: blur(16px);
+}
+
+@utility glass-floating {
+  background: rgb(38 42 52 / 95%);
+  border: 1px solid rgb(0 242 254 / 20%);
+  backdrop-filter: blur(24px);
+}
+
+@supports (backdrop-filter: blur(24px)) {
+  .glass-floating {
+    background: rgb(38 42 52 / 80%);
   }
 }

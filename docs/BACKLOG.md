@@ -77,18 +77,24 @@
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-008 | Definisikan color tokens sebagai CSS variables di `app/globals.css` | 2 | 🔄 |
-| T-009 | Konfigurasi Tailwind v4 dengan `@theme inline` untuk colors, fonts, borderRadius di `app/globals.css` | 2 | 🔄 |
+| T-008 | Definisikan color tokens sebagai CSS variables di `app/globals.css` | 2 | ✅ |
+| T-009 | Konfigurasi Tailwind v4 dengan `@theme inline` untuk colors, fonts, borderRadius di `app/globals.css` | 2 | ✅ |
 | T-010 | Buat komponen `Button` (primary, secondary, destructive, ghost) | 2 | ✅ |
-| T-011 | Buat komponen `Card` dengan glassmorphism style | 2 | ☐ |
-| T-012 | Buat komponen `Badge` / `Chip` (status, pill-shaped) | 1 | ☐ |
-| T-013 | Buat komponen `StatCard` untuk metric display | 2 | ☐ |
-| T-014 | Buat komponen `DataTable` (sortable, filterable, paginated) | 5 | ☐ |
-| T-015 | Buat utility CSS class untuk glassmorphism (`.glass-panel`) | 1 | ☐ |
+| T-011 | Buat komponen `Card` dengan glassmorphism style | 2 | ✅ |
+| T-012 | Buat komponen `Badge` / `Chip` (status, pill-shaped) | 1 | ✅ |
+| T-013 | Buat komponen `StatCard` untuk metric display | 2 | ✅ |
+| T-014 | Buat komponen `DataTable` (sortable, filterable, paginated) | 5 | ✅ |
+| T-015 | Buat utility CSS class untuk glassmorphism (`.glass-panel`) | 1 | ✅ |
 
 **Total SP: 17**
 
-**Progress:** token semantik shadcn, tiga font, radius dasar, dan Button tersedia. T-008/T-009 belum selesai sampai seluruh token canonical DESIGN.md dipetakan; komponen dasar lain dan utility glassmorphism tetap mengikuti task masing-masing.
+**Status: ✅ Selesai.** Pengguna telah menerima hasil story 2 setelah pemeriksaan preview; Button dikonfirmasi terlebih dahulu, kemudian hasil keseluruhan dinyatakan OK.
+
+**Progress (2026-10-18):** implementasi selesai dan diterima pengguna. T-008 sampai T-015 selesai. Seluruh warna canonical DESIGN.md memakai namespace `--kinetic-*` dan utility `*-kinetic-*` agar tidak bentrok dengan mapping semantik shadcn. Font, skala tipografi, spacing, radius, `.glass-panel`, dan `.glass-floating` tersedia.
+
+Komponen owned shadcn: Button (dipertahankan), Card, Badge, Input, Select, dan Dialog. Select/Dialog memakai primitive Radix untuk keyboard dan focus management. Shared `StatCard` mendukung delta positif/negatif/netral serta loading. `DataTable` menerima rows, filtered rowCount, query, dan callback pemanggil untuk sort/search/filter/pagination 25/50/100; integrasi query server menjadi tanggung jawab modul fitur.
+
+**Review manual:** buka `/design-system` pada desktop minimal 1280px. Preview memakai 62 produk contoh; coba sort Pengguna dua arah, pencarian, filter status, page size, navigasi halaman, serta loading/empty state. Coba Select dengan keyboard serta Dialog dengan Tab/Shift+Tab/Escape dan pengembalian fokus. Lint, typecheck, format check, dan production build lolos. Playwright dibatalkan dan dihapus sesuai instruksi pengguna; konfirmasi visual/interaksi dilakukan pengguna.
 
 ---
 
