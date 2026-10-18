@@ -287,12 +287,34 @@ dependency atau Playwright. Adaptasi tablet/mobile tetap P1.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-044 | Buat Server Action `getGlobalKPIs()` (aggregate query ke Supabase) | 3 | ☐ |
-| T-045 | Buat komponen `KPICardGrid` dengan 5 metric cards | 2 | ☐ |
-| T-046 | Implementasi delta calculation (% perubahan vs 30 hari lalu) | 2 | ☐ |
-| T-047 | Tambahkan loading skeleton ke KPI cards | 1 | ☐ |
+| T-044 | Buat Server Action `getGlobalKPIs()` (aggregate query ke Supabase) | 3 | ✅ |
+| T-045 | Buat komponen `KPICardGrid` dengan 5 metric cards | 2 | ✅ |
+| T-046 | Implementasi delta calculation (% perubahan vs 30 hari lalu) | 2 | ✅ |
+| T-047 | Tambahkan loading skeleton ke KPI cards | 1 | ✅ |
 
 **Total SP: 8**
+
+**Status: implementasi selesai; menunggu review visual pengguna.** T-044–T-047
+selesai. `getGlobalKPIs()` memvalidasi admin dan memanggil RPC agregat dengan
+pemeriksaan role/scope di database. Lima StatCard tampil pada dashboard dengan
+skeleton awal, polling 5 menit, refresh manual, error/retry, dan data terakhir
+saat refresh gagal. Operator mengikuti assignment; Total Users dibatasi bagi
+Finance. MRR menormalkan paket tahunan /12, ARR = MRR ×12, hanya subscription
+active dihitung; mata uang terpisah. Delta membandingkan keadaan 30 hari lalu
+melalui before-image audit, termasuk pembatalan/perubahan harga/soft delete.
+Baseline nol ditangani tanpa Infinity; lihat README untuk batas riwayat impor
+atau perubahan service role yang belum diaudit.
+
+Migration `20261018000200_global_kpis.sql` diterapkan ke cloud SDSKanban;
+tipe resmi digenerate ulang. Tidak memasukkan seed ke cloud. `pnpm test:kpis`
+(8 checks), regresi auth/database/navigation (18 checks), lint, typecheck, dan
+production build lolos. Browser dengan sesi Super Admin memverifikasi lima
+kartu nol dari cloud, refresh, interval 300.000 ms dan callback polling,
+error koneksi/data terakhir/pemulihan, dan layout 1280px tanpa overflow.
+Next.js MCP melaporkan tanpa error kompilasi/runtime. Data nonzero/multi-currency
+serta pembatasan role diuji di PostgreSQL embedded; review visual pengguna
+belum dilakukan. Definisi metrik, batas audit historis, dan instruksi verifikasi
+tercantum di README.
 
 ---
 

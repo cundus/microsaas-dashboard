@@ -239,6 +239,43 @@ setelah login dengan admin yang sah pada viewport desktop ≥1280px:
 
 Review visual/interaksi story 5 belum dilakukan. Adaptasi tablet/mobile tetap P1.
 
+Story 6 menampilkan lima KPI dari Supabase pada `/`, dengan skeleton awal,
+refresh otomatis setiap lima menit, tombol refresh, dan pesan kegagalan yang
+mempertahankan data terakhir. Operator hanya melihat produk yang di-assign;
+Finance mendapat metrik finansial dan produk, sementara Total Users dibatasi.
+Database cloud kosong menampilkan nol, tanpa menambahkan seed ke cloud.
+
+MRR menjumlahkan harga subscription berstatus `active`; paket tahunan dibagi 12.
+ARR = MRR × 12. Trial, complimentary, canceled, past_due, dan expired tidak
+menambah MRR. Total Users mengecualikan soft delete; MicroSaaS Count mencakup
+produk aktif maupun nonaktif. Mata uang berbeda ditampilkan terpisah.
+Delta menggunakan `(sekarang - sebelumnya) / sebelumnya × 100`, dibulatkan
+satu desimal. Baseline nol dengan nilai positif ditandai Baru karena persentase
+tidak terdefinisi; nol ke nol ditampilkan 0%.
+
+Nilai 30 hari lalu direkonstruksi dari waktu pembuatan dan before-image audit.
+Riwayat berlaku untuk perubahan yang tercatat oleh audit dashboard. Data impor
+tanpa riwayat diasumsikan belum berubah sebelum event audit pertamanya;
+perubahan melalui service role tanpa identitas admin tidak dicatat oleh trigger
+foundation, sehingga integrasi tersebut harus memasok riwayat audit sebelum
+delta historisnya dapat dianggap akurat. Event baru diurutkan dengan identity
+`event_order`, termasuk beberapa perubahan dalam satu transaksi. Urutan event
+lama yang memiliki timestamp sama sebelum migration ini tidak dapat dipulihkan.
+RPC memeriksa admin aktif dan assignment di database serta hanya mengembalikan
+angka agregat; metadata audit dan PII tidak dikirim ke client.
+
+Jalankan `pnpm test:kpis` untuk memeriksa perhitungan dan izin RPC. Verifikasi
+browser story 6 memakai sesi Super Admin yang tersedia: lima kartu nol,
+refresh manual, timer 300.000 ms beserta callback polling, error koneksi dengan
+data terakhir, pemulihan setelah retry, serta layout desktop 1280px. Skenario
+nonzero, mata uang, dan role lainnya diuji di PostgreSQL embedded. Review visual
+pengguna tetap diperlukan.
+
+Build dapat dijalankan tanpa menyentuh output dev yang sedang aktif:
+`$env:NEXT_DIST_DIR = 'build'; pnpm build` pada PowerShell. Gunakan nilai yang
+sama ketika menjalankan `pnpm start`, lalu hapus environment tersebut sebelum
+menjalankan `pnpm dev` bila ingin kembali ke output default `.next`.
+
 Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
 [Husky](https://typicode.github.io/husky/get-started.html), dan
 [Prettier](https://prettier.io/docs/install).

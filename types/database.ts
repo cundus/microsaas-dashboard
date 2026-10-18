@@ -197,6 +197,7 @@ export type Database = {
           action: string;
           admin_id: string | null;
           created_at: string;
+          event_order: number;
           id: string;
           metadata: Json;
           microsaas_id: string | null;
@@ -207,6 +208,7 @@ export type Database = {
           action: string;
           admin_id?: string | null;
           created_at?: string;
+          event_order?: never;
           id?: string;
           metadata?: Json;
           microsaas_id?: string | null;
@@ -217,6 +219,7 @@ export type Database = {
           action?: string;
           admin_id?: string | null;
           created_at?: string;
+          event_order?: never;
           id?: string;
           metadata?: Json;
           microsaas_id?: string | null;
@@ -1466,6 +1469,15 @@ export type Database = {
     };
     Functions: {
       claim_pending_invites: { Args: never; Returns: number };
+      get_global_kpis: {
+        Args: never;
+        Returns: {
+          currency: string;
+          metric: string;
+          previous: number;
+          value: number;
+        }[];
+      };
       is_project_member: { Args: { p_project: string }; Returns: boolean };
       is_project_member_for_user: {
         Args: { p_project_id: string; p_user_id: string };
