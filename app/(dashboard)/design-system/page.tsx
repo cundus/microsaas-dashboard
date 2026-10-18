@@ -97,7 +97,7 @@ export default function DesignSystemPage() {
     );
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 p-4 md:p-6 xl:p-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-white/8 pb-8">
         <div className="space-y-3">
           <Badge>
@@ -330,6 +330,6 @@ export default function DesignSystemPage() {
           }
         />
       </section>
-    </main>
+    </div>
   );
 }

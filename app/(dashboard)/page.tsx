@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-provider";
-import { LogoutButton } from "@/components/auth/logout-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +18,7 @@ export default function Home() {
   const admin = useAuth();
   if (!admin) return null;
   return (
-    <main className="flex flex-1 items-center justify-center p-8">
+    <div className="flex min-h-[calc(100dvh-9rem)] items-center justify-center">
       <Card className="w-full max-w-xl">
         <CardHeader className="gap-4">
           <ShieldCheck className="size-8 text-primary" aria-hidden="true" />
@@ -34,9 +33,8 @@ export default function Home() {
           <Button asChild>
             <Link href="/design-system">Lihat design system</Link>
           </Button>
-          <LogoutButton />
         </CardContent>
       </Card>
-    </main>
+    </div>
   );
 }

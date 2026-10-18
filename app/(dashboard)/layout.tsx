@@ -1,12 +1,15 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { requireAdmin } from "@/lib/auth/server";
+import { AppShell } from "@/components/layout/app-shell";
 
 async function AdminBoundary({ children }: { children: React.ReactNode }) {
+  await connection();
   const admin = await requireAdmin();
   return (
     <AuthProvider key={JSON.stringify(admin)} admin={admin}>
-      {children}
+      <AppShell>{children}</AppShell>
     </AuthProvider>
   );
 }

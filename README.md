@@ -216,6 +216,29 @@ Playwright.
 - Folder sumber langsung di root, tanpa `src/`; `@/` mengarah ke root proyek.
   Modul dan komponen lain dibuat sesuai task, bukan sekaligus pada setup ini.
 
+Story 5 memasang shell navigasi pada seluruh halaman `(dashboard)`. Sidebar
+menyesuaikan menu berdasarkan role, menyimpan status collapse di localStorage,
+dan menandai modul aktif. Header menyediakan profil serta dropdown logout.
+Modul pada backlog yang belum tersedia menampilkan placeholder; halaman nested
+seperti `/payment/plans` dan `/settings/team` juga menyediakan breadcrumb.
+Placeholder melakukan pemeriksaan role di server, sementara query modul nantinya
+tetap wajib memakai validasi server dan RLS.
+
+Jalankan `pnpm test:navigation` untuk tes logika navigasi. Review manual story 5
+setelah login dengan admin yang sah pada viewport desktop ≥1280px:
+
+- Ciutkan/perluas sidebar, pindah halaman, lalu reload; pilihan tetap tersimpan.
+  Buka tab kedua dan periksa sinkronisasi pilihan.
+- Buka halaman nested dari Pembayaran atau Pengaturan; periksa breadcrumb dan
+  active state menu induk. Menu tim/audit hanya tersedia untuk Super Admin.
+- Periksa avatar inisial, nama, email, dan role. Buka dropdown profil lewat
+  keyboard, Tab menuju Keluar, Escape untuk menutup, dan klik di luar dropdown.
+- Gunakan skip link dengan Tab pertama, lalu uji logout dari dropdown.
+- Periksa role Operator dan Finance; menu terbatas disembunyikan dan URL
+  placeholder yang tidak diizinkan mengarah ke `/403`.
+
+Review visual/interaksi story 5 belum dilakukan. Adaptasi tablet/mobile tetap P1.
+
 Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
 [Husky](https://typicode.github.io/husky/get-started.html), dan
 [Prettier](https://prettier.io/docs/install).

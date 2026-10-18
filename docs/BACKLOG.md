@@ -229,14 +229,41 @@ serta penerimaan visual belum dilakukan; aplikasi tidak membuat akun default.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-038 | Buat komponen `AppShell` (sidebar + header + content area) | 3 | ☐ |
-| T-039 | Buat komponen `Sidebar` dengan semua menu items dan icon | 3 | ☐ |
-| T-040 | Buat komponen `Header` dengan user avatar, nama, dan role | 2 | ☐ |
-| T-041 | Buat komponen `Breadcrumb` yang dinamis | 1 | ☐ |
-| T-042 | Implementasi collapsible sidebar dengan state persist (localStorage) | 2 | ☐ |
-| T-043 | Buat `RootLayout` yang membungkus semua halaman admin | 1 | ☐ |
+| T-038 | Buat komponen `AppShell` (sidebar + header + content area) | 3 | ✅ |
+| T-039 | Buat komponen `Sidebar` dengan semua menu items dan icon | 3 | ✅ |
+| T-040 | Buat komponen `Header` dengan user avatar, nama, dan role | 2 | ✅ |
+| T-041 | Buat komponen `Breadcrumb` yang dinamis | 1 | ✅ |
+| T-042 | Implementasi collapsible sidebar dengan state persist (localStorage) | 2 | ✅ |
+| T-043 | Buat `RootLayout` yang membungkus semua halaman admin | 1 | ✅ |
 
 **Total SP: 12**
+
+**Status: implementasi selesai; menunggu review visual pengguna.** Shell dipasang
+di layout `(dashboard)` setelah validasi admin dan di dalam AuthProvider. Login,
+401, dan 403 tetap memakai layout publik. Sidebar memakai ikon Lucide, active
+state berdasarkan batas segmen URL, serta menu sesuai role. Header menampilkan
+avatar inisial, nama, role, dan dropdown profil dengan LogoutButton story 4.
+Dropdown mendukung Tab, Escape, penutupan saat fokus/klik keluar, dan pemulihan
+fokus setelah Escape. Breadcrumb dinamis tersedia pada halaman nested.
+
+State sidebar disimpan pada localStorage (`microsaas:sidebar-collapsed`),
+disinkronkan antar tab, dan tetap bisa diubah dalam memori bila storage diblokir.
+Snapshot server memakai sidebar terbuka untuk menjaga hydration konsisten.
+Desktop memakai sidebar sticky, header sticky, dan margin konten 32px sesuai
+DESIGN.md. Skip link serta nama aksesibel untuk navigasi ikon tersedia.
+
+Seluruh menu utama memiliki tujuan yang dapat dibuka. Modul yang belum
+diimplementasikan memakai placeholder eksplisit, termasuk submenu pembayaran,
+transaksi, tim admin, dan audit log untuk mencoba breadcrumb nested. Placeholder
+memvalidasi path dan role di server; URL lain menghasilkan not-found. Ini belum
+mengimplementasikan fitur modul ataupun query data pada story berikutnya.
+
+**Verifikasi:** `pnpm test:navigation` (4 tes) mencakup active state nested,
+batas segmen URL, menu/akses tiga role, breadcrumb, dan tujuan navigasi.
+Tes auth (6) dan database (8 checks), lint, typecheck, format check, serta
+production build lolos. Interaksi browser dengan akun admin nyata dan review
+visual desktop belum dilakukan; checklist tersedia di README. Tidak menambah
+dependency atau Playwright. Adaptasi tablet/mobile tetap P1.
 
 ---
 
