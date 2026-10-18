@@ -1,7 +1,7 @@
 # Product Backlog
 ## Multi-MicroSaaS Admin Dashboard
 
-**Versi:** 1.0.0  
+**Versi:** 1.1.0
 **Terakhir Diupdate:** 2026-10-18  
 **Referensi:** [PRD.md](./PRD.md)
 
@@ -19,7 +19,11 @@
 | 🔄 | Sedang dikerjakan |
 | ✅ | Selesai |
 
-**Story Point (SP):** 1 = ~2 jam, 2 = ~4 jam, 3 = ~1 hari, 5 = ~2 hari, 8 = ~1 minggu
+**Story Point (SP):** Ukuran relatif kompleksitas, bukan konversi jam. Kapasitas perencanaan sementara: 40 SP per sprint dua minggu; validasi lewat velocity aktual.
+
+**Kontrak dokumen:** PRD menentukan scope/prioritas/hak akses; DESIGN.md menentukan token/layout. P0 = MVP, P1 = Growth, P2 = Scale, P3 = Future. Story campuran mengikuti prioritas per requirement di tabel pemetaan di bawah. Task ☐ belum menjadi bukti fitur tersedia. Estimasi baseline belum mencakup gap yang ditandai belum diestimasi.
+
+**Viewport:** desktop ≥1280px wajib pada P0; tablet 768–1279px dan mobile 360–767px pada P1. Sidebar/header adalah navigasi MVP; dock mobile opsional.
 
 ---
 
@@ -44,7 +48,7 @@
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-001 | Init Next.js 14 project dengan TypeScript | 1 | ☐ |
+| T-001 | Init Next.js 14+ (App Router) dengan TypeScript | 1 | ☐ |
 | T-002 | Setup Tailwind CSS + shadcn/ui | 1 | ☐ |
 | T-003 | Konfigurasi font: Plus Jakarta Sans, Inter, JetBrains Mono | 1 | ☐ |
 | T-004 | Setup ESLint + Prettier + Husky | 1 | ☐ |
@@ -63,8 +67,8 @@
 **agar** semua halaman konsisten secara visual.
 
 **Acceptance Criteria:**
-- CSS variables untuk semua color token terdefinisi
-- Komponen dasar tersedia: Button, Card, Badge, Input, Select, Modal
+- CSS variables mengikuti nilai HEX canonical pada front matter DESIGN.md dan mapping shadcn PRD §7.2
+- Komponen dasar shadcn/ui tersedia: Button, Card, Badge, Input, Select, Dialog (modal)
 - Dark mode aktif sebagai default (tidak ada light mode toggle)
 - Glassmorphism utility class tersedia
 
@@ -108,14 +112,14 @@
 | T-023 | Buat migration: tabel `performance_metrics`, `audit_logs` | 2 | ☐ |
 | T-024 | Buat migration: tabel `alert_rules`, `alert_logs` | 1 | ☐ |
 | T-025 | Buat migration: tabel `admin_assignments` (operator per MicroSaaS) | 1 | ☐ |
-| T-026 | Definisikan RLS policy: Super Admin bypass all | 3 | ☐ |
+| T-026 | Definisikan RLS policy: Super Admin akses penuh berbasis role; audit append-only | 3 | ☐ |
 | T-027 | Definisikan RLS policy: Operator Admin — scoped ke MicroSaaS | 3 | ☐ |
 | T-028 | Definisikan RLS policy: Finance Admin — read-only revenue tables | 2 | ☐ |
 | T-029 | Setup Supabase client di Next.js (server + browser + middleware) | 2 | ☐ |
 | T-030 | Buat seed script dengan dummy data (3 MicroSaaS, 50 users, dll.) | 3 | ☐ |
 | T-031 | Generate TypeScript types dari Supabase schema | 1 | ☐ |
 
-**Total SP: 31**
+**Total SP: 30**
 
 ---
 
@@ -155,7 +159,7 @@
 - Sidebar navigasi dengan semua menu utama
 - Header dengan info user yang sedang login + dropdown logout
 - Breadcrumb pada halaman nested
-- Collapsible sidebar untuk viewport lebih kecil
+- Sidebar collapsible dengan state persist pada desktop ≥1280px; adaptasi tablet/mobile P1
 - Active state pada menu yang sedang aktif
 
 | # | Task | SP | Status |
@@ -184,7 +188,7 @@
 **agar** saya bisa mengetahui kondisi bisnis secara keseluruhan sekilas.
 
 **Acceptance Criteria:**
-- 4 metric card: Total Users, Total MRR, Active Subscriptions, MicroSaaS Count
+- 5 metric card: Total Users, Total MRR, Total ARR, Active Subscriptions, MicroSaaS Count
 - Setiap card menampilkan delta persentase vs periode sebelumnya
 - Data refresh otomatis setiap 5 menit
 - Loading skeleton saat data sedang di-fetch
@@ -192,7 +196,7 @@
 | # | Task | SP | Status |
 |---|---|---|---|
 | T-044 | Buat Server Action `getGlobalKPIs()` (aggregate query ke Supabase) | 3 | ☐ |
-| T-045 | Buat komponen `KPICardGrid` dengan 4 metric cards | 2 | ☐ |
+| T-045 | Buat komponen `KPICardGrid` dengan 5 metric cards | 2 | ☐ |
 | T-046 | Implementasi delta calculation (% perubahan vs 30 hari lalu) | 2 | ☐ |
 | T-047 | Tambahkan loading skeleton ke KPI cards | 1 | ☐ |
 
@@ -276,7 +280,7 @@
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-060 | Buat query `getRecentActivity(limit)` dari audit_logs | 2 | ☐ |
+| T-060 | Buat query `getRecentActivity(limit)` dari signup, perubahan subscription, metrik error, dan audit admin yang relevan | 2 | ☐ |
 | T-061 | Buat komponen `ActivityFeed` dengan item list | 2 | ☐ |
 | T-062 | Subscribe ke Supabase Realtime channel untuk live updates | 3 | ☐ |
 
@@ -331,8 +335,8 @@
 | # | Task | SP | Status |
 |---|---|---|---|
 | T-071 | Buat layout halaman `/microsaas/[slug]` dengan tab navigation | 2 | ☐ |
-| T-072 | Buat tab Overview: KPI mini + recent activity | 2 | ☐ |
-| T-073 | Tab Users, Subscriptions, Revenue, Performance (stub — diisi di epic lain) | 1 | ☐ |
+| T-072 | Buat tab Overview: KPI mini (P0) + recent activity (P1, mengikuti FR-05) | 2 | ☐ |
+| T-073 | Integrasi tab Users, Subscriptions, Revenue, Performance dari epic terkait; stub tidak memenuhi acceptance MVP | 1 | ☐ |
 
 **Total SP: 5**
 
@@ -395,7 +399,7 @@
 **Acceptance Criteria:**
 - URL: `/users/[userId]`
 - Tampilkan: info profil, subscription aktif, riwayat transaksi, log login terakhir
-- Semua data terformat rapi dengan komponen yang konsisten
+- Semua data terformat rapi dengan komponen yang konsisten; detail invoice/gateway response mengikuti FR-43 (P1)
 
 | # | Task | SP | Status |
 |---|---|---|---|
@@ -430,7 +434,7 @@
 | T-092 | Buat Server Action `deleteUser(userId)` dengan soft delete | 2 | ☐ |
 | T-093 | Buat komponen `UserActionsMenu` (dropdown atau button group) | 2 | ☐ |
 | T-094 | Buat komponen `ConfirmDialog` yang reusable | 2 | ☐ |
-| T-095 | Setup toast notification sistem (react-hot-toast / sonner) | 1 | ☐ |
+| T-095 | Setup toast notification sistem (Sonner) | 1 | ☐ |
 
 **Total SP: 12**
 
@@ -490,6 +494,7 @@
 
 **Acceptance Criteria:**
 - Tabel subscription: User, MicroSaaS, Plan, Status, Next Billing Date, Amount
+- Detail subscription: plan, billing cycle, next payment date, payment method (FR-31, P0; bagian T-105)
 - Tab filter: All / Active / Trial / Past Due / Canceled
 - Sortable dan filterable
 
@@ -504,7 +509,7 @@
 
 ---
 
-### STORY-020 🔴 — Subscription Override (Manual Change)
+### STORY-020 🔴/🟠 — Subscription Override (P0/P1)
 
 **Sebagai** Admin,  
 **saya ingin** mengubah subscription user secara manual,  
@@ -514,7 +519,7 @@
 - Upgrade / Downgrade plan (pilih plan baru dari dropdown)
 - Extend trial period
 - Cancel subscription (immediate atau end of period)
-- Tambah subscription gratis / complimentary
+- Tambah subscription gratis / complimentary (FR-33, P1; bukan syarat MVP)
 - Semua aksi tercatat di audit log
 
 | # | Task | SP | Status |
@@ -580,7 +585,7 @@
 
 ---
 
-### STORY-023 🔴 — Transaction History
+### STORY-023 🔴/🟠 — Transaction History (P0/P1)
 
 **Sebagai** Finance Admin,  
 **saya ingin** melihat semua riwayat transaksi dengan detail lengkap,  
@@ -589,8 +594,8 @@
 **Acceptance Criteria:**
 - Tabel transaksi: User, MicroSaaS, Amount, Status, Gateway, Tanggal
 - Filter: status (success/failed/refunded), gateway, MicroSaaS, date range
-- Klik row → detail transaksi (modal): invoice, gateway response
-- Export CSV
+- Klik row → detail transaksi (modal): invoice, payment method, gateway response (FR-43, P1)
+- Export CSV transaksi (FR-44, P1); daftar/filter transaksi tetap P0
 
 | # | Task | SP | Status |
 |---|---|---|---|
@@ -617,7 +622,7 @@
 **agar** semua MicroSaaS menggunakan konfigurasi yang sama dan terpusat.
 
 **Acceptance Criteria:**
-- Form per gateway: Stripe, Midtrans (tambah gateway lain via UI)
+- Form per gateway: Stripe dan Midtrans; gateway tambahan memerlukan adapter yang mendukung provider tersebut
 - Field: API Key (public + secret), Webhook Secret, Mode (sandbox/production)
 - Secret fields ditampilkan masked, klik untuk reveal
 - Test connection button
@@ -644,7 +649,7 @@
 **Acceptance Criteria:**
 - CRUD pricing plan: nama, harga, interval (monthly/annual), fitur list, trial period
 - Assign plan ke satu atau banyak MicroSaaS
-- Preview plan (tampil seperti di halaman pricing publik)
+- Preview visual plan (T-135, P0); workflow draft/publish harga dan grandfathering terpisah pada FR-53 (P1, belum diestimasi)
 - Arsipkan plan (tidak dihapus agar tidak merusak subscription aktif)
 
 | # | Task | SP | Status |
@@ -714,6 +719,7 @@
 - Persentase uptime 30 hari per MicroSaaS
 - Visual timeline uptime (bar hijau/merah per hari)
 - Data diambil dari tabel `performance_metrics`
+- Uptime tersedia juga pada tab Performance per MicroSaaS (FR-11/FR-60, P0); response time/error rate P1
 
 | # | Task | SP | Status |
 |---|---|---|---|
@@ -807,6 +813,8 @@
 - 3 role bawaan: Super Admin, Operator Admin, Finance Admin
 - Setiap route dan aksi diperiksa berdasarkan role
 - UI menyembunyikan fitur yang tidak diizinkan (bukan hanya disable)
+- Operator dibatasi assignment; Finance read-only untuk data keuangan/metadata non-secret
+- Server Action memvalidasi identitas, role, scope sebelum memakai Service Role untuk operasi istimewa
 
 | # | Task | SP | Status |
 |---|---|---|---|
@@ -827,7 +835,7 @@
 
 **Acceptance Criteria:**
 - Invite admin via email (kirim link invite)
-- Set role saat invite
+- Set role saat invite; assign/unassign Operator Admin ke MicroSaaS (FR-14, P0; bagian T-166/T-167)
 - Edit role admin yang sudah ada
 - Revoke / disable akun admin
 
@@ -873,8 +881,8 @@
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-174 | Implementasi TOTP 2FA via Supabase Auth MFA | 3 | ☐ |
-| T-175 | Buat halaman setup 2FA di `/settings` (QR code + backup codes) | 3 | ☐ |
+| T-174 | Implementasi TOTP 2FA dan alur pemulihan akun; verifikasi dukungan recovery provider | 3 | ☐ |
+| T-175 | Buat halaman setup 2FA di `/settings` (QR code + alur pemulihan yang telah diverifikasi) | 3 | ☐ |
 | T-176 | Enforce 2FA challenge saat login jika sudah di-setup | 2 | ☐ |
 
 **Total SP: 8**
@@ -885,35 +893,78 @@
 
 | Epic | Stories | Total SP | Prioritas |
 |---|---|---|---|
-| EPIC 1 — Foundation | 5 | 77 | 🔴 P0 |
+| EPIC 1 — Foundation | 5 | 76 | 🔴 P0 |
 | EPIC 2 — Global Dashboard | 5 | 39 | 🔴/🟠 P0-P1 |
 | EPIC 3 — MicroSaaS Management | 3 | 30 | 🔴/🟠 P0-P1 |
 | EPIC 4 — User Management | 5 | 51 | 🔴/🟠/🟡 P0-P2 |
 | EPIC 5 — Subscription Management | 3 | 28 | 🔴/🟠 P0-P1 |
-| EPIC 6 — Revenue & Finance | 2 | 22 | 🔴 P0 |
+| EPIC 6 — Revenue & Finance | 2 | 22 | 🔴/🟠 P0-P1 |
 | EPIC 7 — Payment Configuration | 4 | 40 | 🔴/🟠 P0-P1 |
 | EPIC 8 — Performance Monitoring | 2 | 21 | 🔴/🟠 P0-P1 |
 | EPIC 9 — Notification & Alerting | 2 | 24 | 🟠 P1 |
 | EPIC 10 — Admin & Access Control | 4 | 37 | 🔴/🟠 P0-P1 |
-| **TOTAL** | **35** | **369 SP** | |
+| **TOTAL** | **35** | **368 SP** | |
 
 ---
+
+## Pemetaan Requirement & Gap
+
+Pemetaan ini melengkapi acceptance criteria story. P0 wajib ditutup sebelum MVP; label prioritas pada story tidak menaikkan prioritas seluruh isinya.
+
+| PRD | Prioritas | Story / tindak lanjut |
+|---|---|---|
+| FR-01–03 | P0 | STORY-006–008; lima KPI termasuk ARR |
+| FR-04–05 | P1 | STORY-009–010; agregasi harian/mingguan/bulanan pada T-057 |
+| FR-06 | P2 | Quick actions promo/broadcast; belum diestimasi |
+| FR-10–11 | P0 | STORY-011–012 + integrasi tab dari STORY-014/019/022/028 |
+| FR-12–13 | P1 | STORY-013 |
+| FR-14 | P0 | STORY-033, T-166/T-167 + scope RLS STORY-003/032 |
+| FR-20–23, FR-26 | P0 | STORY-014–016; soft delete, konfirmasi destruktif, pagination |
+| FR-24 | P1 | STORY-017; integrasi token/banner/stop session perlu dukungan tiap MicroSaaS |
+| FR-25 | P2 | STORY-018 untuk CSV/bulk ban; bulk email belum diestimasi |
+| FR-27 | P2 | Infinite scroll opsional; belum diestimasi |
+| FR-30–32 | P0 | STORY-019–020; detail subscription termasuk T-105 |
+| FR-33 | P1 | T-110 dalam STORY-020 |
+| FR-34–35 | P1 | STORY-021; cohort retention belum diestimasi |
+| FR-40–42 | P0 | STORY-022–023; breakdown per plan bagian T-116/T-118 |
+| FR-43–44 | P1 | T-123/T-124; export CSV laporan agregat revenue belum diestimasi |
+| FR-45–46 | P2 | Refund dan export Excel; belum diestimasi |
+| FR-50–52 | P0 | STORY-024–025; secret terenkripsi, plan diarsipkan |
+| FR-53 | P1 | Draft/publish dan grandfathering; belum diestimasi; T-135 hanya preview visual |
+| FR-54 | P1 | STORY-026 |
+| FR-55 | P2 | Konfigurasi tax; belum diestimasi |
+| FR-56 | P1 | STORY-027; log request/response wajib menyamarkan secret |
+| FR-60 | P0 | STORY-028; wajib sebelum MVP |
+| FR-61–63 | P1 | STORY-029; breakdown per endpoint bagian T-147/T-148 |
+| FR-64 | P2 | Slow query/connection pool; belum diestimasi |
+| FR-65 | P3 | Status page; belum diestimasi |
+| FR-70–71 | P1 | STORY-030–031 |
+| FR-72–73 | P2 | Riwayat alert lengkap dan broadcast; belum diestimasi; dropdown P1 hanya alert terbaru |
+| FR-80–82 | P0 | STORY-032–034; dikerjakan mulai Foundation |
+| FR-83 | P1 | Daftar/revoke session admin; belum diestimasi; STORY-004 hanya sesi login/logout saat ini |
+| FR-84 | P1 | STORY-035; alur pemulihan harus diverifikasi sebelum implementasi |
+| NFR-01–08 | P0 | Validasi performa, uptime, auth/otorisasi, enkripsi, skala, desktop, konfirmasi destruktif pada QA; belum diestimasi terpisah |
+| NFR-07, adaptasi tablet/mobile | P1 | Drawer/layout responsif sesuai DESIGN.md; belum diestimasi |
+
+Tambahan atau perubahan acceptance criteria pada task yang sudah ada (assignment operator, detail subscription, breakdown per plan/endpoint, lima KPI, integrasi tab, sumber activity feed, dan pemulihan 2FA) memerlukan estimasi ulang sebelum sprint commitment. Angka 368 SP adalah baseline task awal yang telah dikoreksi aritmetikanya, bukan estimasi lengkap untuk semua requirement. Task baru untuk gap harus mendapat ID, estimasi, dan acceptance criteria saat refinement; tidak dianggap selesai oleh story terkait.
 
 ## Sprint Planning (Estimasi)
 
-Asumsi: 1 developer, kapasitas **~40 SP/sprint** (2 minggu per sprint).
+Asumsi sementara: satu developer, kapasitas 40 SP/sprint, dua minggu/sprint. Milestone mencakup pekerjaan campuran P0–P2; pekerjaan Growth/Scale dapat ditunda untuk memprioritaskan MVP. RBAC dan audit disiapkan sebelum mutasi bisnis.
 
-| Sprint | Milestone | Epic yang Dikerjakan | Target SP |
-|---|---|---|---|
-| Sprint 1 | M1 — Foundation | EPIC 1 (Foundation, Auth, DB, Layout) | 77 SP |
-| Sprint 2 | M2 — Core Dashboard | EPIC 2 (Dashboard) + EPIC 3 (MicroSaaS CRUD) | ~70 SP |
-| Sprint 3 | M2 — User Mgmt | EPIC 4 (User Management) | ~51 SP |
-| Sprint 4 | M3 — Revenue & Payment | EPIC 5 + EPIC 6 + EPIC 7 (partial) | ~70 SP |
-| Sprint 5 | M4 — Performance & Alerts | EPIC 7 (sisa) + EPIC 8 + EPIC 9 | ~70 SP |
-| Sprint 6 | M5 — Polish & Security | EPIC 10 + QA + Bug fix + Deploy | ~37 SP |
+| Sprint | Milestone | Lingkup baseline | Total SP | Rata-rata SP/sprint |
+|---|---|---|---|---|
+| 1–3 | M1 — Foundation & Security | EPIC 1 + STORY-032–034 | 105 | 35 |
+| 4–6 | M2 — Core Dashboard | EPIC 2–4 | 120 | 40 |
+| 7–9 | M3 — Revenue & Payment | EPIC 5–7 | 90 | 30 |
+| 10–11 | M4 — Performance & Alerts | EPIC 8–9 | 45 | 22.5 |
+| 12 | M5 — Polish & Launch | STORY-035 + QA, hardening, deploy | 8 | 8 (fitur terestimasi) |
+| **Total** | | | **368** | |
 
-> **Catatan:** SP yang tinggi di Sprint 1 dikarenakan banyak setup satu kali. Sprint selanjutnya lebih fokus pada fitur.
+Rencana berurutan sekitar 24 minggu; pembagian task tiap sprint dilakukan saat refinement dan harus ≤40 SP. Sisa kapasitas merupakan ruang QA/integrasi dan estimasi ulang, bukan jaminan seluruh gap muat. Jadwal ditinjau ulang setelah gap diestimasi. Tidak ada task yang dihitung dua kali; STORY-032–034 dipindahkan dari tahap akhir ke M1.
+
+**Gate MVP:** seluruh P0 pada PRD lolos, termasuk RBAC tiga role, audit append-only, assignment operator, uptime 30 hari, dan desktop ≥1280px. Stub tab, konfigurasi dummy, atau task bertanda ☐ tidak memenuhi gate.
 
 ---
 
-*Backlog ini adalah living document. Update status task secara berkala seiring progress pengerjaan.*
+*Backlog ini adalah living document. Update status berdasarkan bukti implementasi dan verifikasi.*

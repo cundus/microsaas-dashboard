@@ -1,7 +1,7 @@
 # Product Requirements Document
 ## Multi-MicroSaaS Admin Dashboard
 
-**Version:** 1.0.0  
+**Version:** 1.1.0
 **Tanggal:** 2026-10-18  
 **Status:** Draft  
 **Owner:** Admin / Founder  
@@ -35,7 +35,7 @@ Sebuah admin dashboard berbasis web yang menjadi pusat kendali tunggal untuk mem
 |---|---|
 | **Super Admin (Founder)** | Akses penuh ke semua fitur, semua MicroSaaS |
 | **Operator Admin** | Akses terbatas per MicroSaaS yang di-assign |
-| **Finance Admin** | Akses ke modul Revenue, Subscription, dan Payment Config |
+| **Finance Admin** | Baca revenue, subscription, invoice, dan metadata plan/gateway; tanpa akses secret atau mutasi |
 | **End User (MicroSaaS)** | Tidak memiliki akses ke dashboard ini; hanya dikelola dari sini |
 
 ---
@@ -62,6 +62,13 @@ Sebuah admin dashboard berbasis web yang menjadi pusat kendali tunggal untuk mem
 
 ---
 
+### 3.3 Acuan & Tahapan Rilis
+
+- PRD menjadi acuan scope, prioritas, dan hak akses: P0 = MVP, P1 = Growth, P2 = Scale, P3 = Future.
+- [BACKLOG.md](./BACKLOG.md) memetakan requirement ke pekerjaan dan estimasi. Story dapat memuat beberapa prioritas; bagian P1/P2 tidak menjadi syarat selesai MVP.
+- [DESIGN.md](../DESIGN.md) menjadi acuan token dan layout. MVP berfokus pada desktop ≥1280px; adaptasi tablet/mobile adalah P1.
+- Status backlog adalah rencana, bukan bukti implementasi. Perubahan requirement harus diperbarui pada dokumen terkait.
+
 ## 4. User Stories
 
 ### 4.1 Monitoring & Overview
@@ -74,7 +81,7 @@ agar saya bisa mengidentifikasi produk yang perlu perhatian dengan cepat.
 
 ```
 Sebagai Admin,
-saya ingin melihat grafik pertumbuhan user (DAU/MAU) per MicroSaaS,
+saya ingin melihat grafik pertumbuhan user baru per hari/minggu/bulan per MicroSaaS,
 agar saya bisa memahami tren adopsi produk.
 ```
 
@@ -148,7 +155,7 @@ agar saya bisa mendeteksi degradasi layanan sebelum user complain.
 
 ```
 Sebagai Admin,
-saya ingin menerima notifikasi (email/push) ketika ada anomali metrik,
+saya ingin menerima notifikasi (email, Slack, atau in-app) ketika ada anomali metrik,
 agar saya bisa merespons insiden dengan cepat.
 ```
 
@@ -160,7 +167,7 @@ agar saya bisa merespons insiden dengan cepat.
 
 | ID | Requirement | Prioritas |
 |---|---|---|
-| FR-01 | Tampilkan KPI agregat: Total User, Total MRR, Total ARR, Active Subscriptions | P0 |
+| FR-01 | Tampilkan lima KPI agregat: Total Users, Total MRR, Total ARR, Active Subscriptions, MicroSaaS Count | P0 |
 | FR-02 | Tampilkan kartu ringkasan per MicroSaaS dengan status health indicator | P0 |
 | FR-03 | Grafik tren pendapatan (7 hari, 30 hari, 90 hari, custom range) | P0 |
 | FR-04 | Grafik pertumbuhan user baru per hari/minggu/bulan | P1 |
@@ -172,10 +179,10 @@ agar saya bisa merespons insiden dengan cepat.
 | ID | Requirement | Prioritas |
 |---|---|---|
 | FR-10 | CRUD MicroSaaS (nama, slug, deskripsi, logo, URL, status aktif/nonaktif) | P0 |
-| FR-11 | Tiap MicroSaaS memiliki halaman detail dengan tab: Overview, Users, Revenue, Performance | P0 |
+| FR-11 | Tiap MicroSaaS memiliki halaman detail dengan tab: Overview, Users, Subscriptions, Revenue, Performance | P0 |
 | FR-12 | Konfigurasi metadata per MicroSaaS (webhook URL, API key, environment) | P1 |
 | FR-13 | Toggle maintenance mode per MicroSaaS | P1 |
-| FR-14 | Assign admin/operator ke MicroSaaS tertentu | P2 |
+| FR-14 | Assign admin/operator ke MicroSaaS tertentu untuk isolasi akses | P0 |
 
 ### 5.3 Modul: User Management
 
@@ -187,7 +194,8 @@ agar saya bisa merespons insiden dengan cepat.
 | FR-23 | Aksi: Ban/Unban, Reset Password, Delete Account | P0 |
 | FR-24 | Impersonate user (dengan audit log wajib) | P1 |
 | FR-25 | Bulk actions: export CSV, bulk ban, bulk email | P2 |
-| FR-26 | Pagination dan infinite scroll pada tabel user | P1 |
+| FR-26 | Pagination server-side pada tabel user (25/50/100 per halaman) | P0 |
+| FR-27 | Infinite scroll opsional pada tabel user | P2 |
 
 ### 5.4 Modul: Subscription Management
 
@@ -208,8 +216,9 @@ agar saya bisa merespons insiden dengan cepat.
 | FR-41 | Breakdown pendapatan per MicroSaaS dan per plan | P0 |
 | FR-42 | Riwayat transaksi dengan filter tanggal, status, MicroSaaS, gateway | P0 |
 | FR-43 | Detail transaksi: invoice, payment method, gateway response | P1 |
-| FR-44 | Export laporan pendapatan ke CSV/Excel | P1 |
+| FR-44 | Export laporan pendapatan dan transaksi ke CSV | P1 |
 | FR-45 | Refund transaksi dari dashboard (terintegrasi ke payment gateway) | P2 |
+| FR-46 | Export laporan pendapatan ke Excel | P2 |
 
 ### 5.6 Modul: Payment Configuration
 
@@ -218,7 +227,7 @@ agar saya bisa merespons insiden dengan cepat.
 | FR-50 | Konfigurasi payment gateway: Stripe, Midtrans, atau gateway lain (API key, webhook secret) | P0 |
 | FR-51 | CRUD pricing plan: nama, harga, interval (bulanan/tahunan), fitur, trial period | P0 |
 | FR-52 | Assign plan ke satu atau banyak MicroSaaS | P0 |
-| FR-53 | Preview perubahan harga sebelum publish (draft mode) | P1 |
+| FR-53 | Draft harga, preview sebelum publish, dan grandfathering subscription aktif | P1 |
 | FR-54 | Promo code / coupon: persentase atau nominal, masa berlaku, batas penggunaan | P1 |
 | FR-55 | Konfigurasi tax rate per negara / region | P2 |
 | FR-56 | Webhook log: request/response payment gateway untuk debugging | P1 |
@@ -260,12 +269,12 @@ agar saya bisa merespons insiden dengan cepat.
 | ID | Requirement | Target |
 |---|---|---|
 | NFR-01 | **Performance** - Initial page load time | < 2 detik |
-| NFR-02 | **Performance** - Data table render (1000 rows) | < 500ms |
+| NFR-02 | **Performance** - Benchmark render tabel dengan fixture 1000 rows; UI produksi tetap memakai pagination server-side | < 500ms |
 | NFR-03 | **Availability** - Dashboard uptime | ≥ 99.5% |
 | NFR-04 | **Security** - Semua API endpoint dilindungi autentikasi + otorisasi | Wajib |
 | NFR-05 | **Security** - Sensitive data (API keys) dienkripsi at rest | Wajib |
 | NFR-06 | **Scalability** - Support hingga 50 MicroSaaS dan 1 juta user agregat | v1.0 |
-| NFR-07 | **Responsiveness** - Fungsional di viewport 1280px ke atas | Wajib |
+| NFR-07 | **Responsiveness** - Semua fitur MVP fungsional pada viewport ≥1280px dengan sidebar collapsible | P0; adaptasi 768–1279px dan 360–767px pada P1 |
 | NFR-08 | **Audit** - Semua aksi destruktif memerlukan konfirmasi eksplisit | Wajib |
 
 ---
@@ -309,21 +318,24 @@ shadcn/ui digunakan sebagai **fondasi komponen yang di-own langsung** (bukan dep
 
 **Kustomisasi Kinetic Obsidian di atas shadcn:**
 
-```css
-/* globals.css — override shadcn CSS variables dengan token Kinetic Obsidian */
-:root {
-  --background: 222 47% 8%;           /* #0F131C */
-  --foreground: 225 20% 93%;          /* #DFE2EF */
-  --card: 222 40% 11%;                /* #1C1F29 */
-  --card-foreground: 225 20% 93%;
-  --primary: 183 100% 50%;            /* #00F2FE — Electric Cyan */
-  --primary-foreground: 183 100% 11%;
-  --secondary: 238 84% 48%;           /* #3131C0 — Electric Indigo */
-  --muted: 220 20% 18%;
-  --border: 183 20% 26%;             /* #3A494B */
-  --ring: 183 100% 50%;
-}
-```
+Nilai HEX di front matter `DESIGN.md` menjadi acuan tunggal. Konversi ke HSL untuk Tailwind v3 harus mempertahankan warna tersebut.
+
+| shadcn variable | Token DESIGN.md | HEX |
+|---|---|---|
+| `--background` | `background` | `#0f131c` |
+| `--foreground`, `--card-foreground` | `on-surface` | `#dfe2ef` |
+| `--card` | `surface-container` | `#1c1f29` |
+| `--primary`, `--ring` | `primary-container` | `#00f2fe` |
+| `--primary-foreground` | `on-primary` | `#00373a` |
+| `--secondary` | `secondary-container` | `#3131c0` |
+| `--secondary-foreground` | `on-secondary-container` | `#b0b2ff` |
+| `--muted` | `surface-container-high` | `#262a34` |
+| `--muted-foreground` | `on-surface-variant` | `#b9cacb` |
+| `--border`, `--input` | `outline-variant` | `#3a494b` |
+| `--destructive` | `error-container` | `#93000a` |
+| `--destructive-foreground` | `on-error-container` | `#ffdad6` |
+
+Status sukses memakai `tertiary-container` (`#67f4b7`). Token `primary` di DESIGN.md adalah warna teks tonal; CTA shadcn memakai `primary-container`.
 
 ### 7.3 Database Architecture (Supabase)
 
@@ -333,6 +345,7 @@ shadcn/ui digunakan sebagai **fondasi komponen yang di-own langsung** (bukan dep
 ├── public.microsaas              -- Registry semua MicroSaaS
 ├── public.admin_users            -- Akun admin dashboard
 ├── public.admin_roles            -- Role & permission admin
+├── public.admin_assignments      -- Scope operator per MicroSaaS
 ├── public.audit_logs             -- Log semua aksi admin
 │
 ├── public.users                  -- User agregat dari semua MicroSaaS
@@ -341,16 +354,22 @@ shadcn/ui digunakan sebagai **fondasi komponen yang di-own langsung** (bukan dep
 ├── public.subscriptions          -- Data subscription aktif
 ├── public.plans                  -- Pricing plans
 ├── public.transactions           -- Riwayat transaksi pembayaran
+├── public.invoices               -- Invoice transaksi
 │
 ├── public.payment_gateways       -- Konfigurasi gateway (encrypted)
 ├── public.promo_codes            -- Promo & coupon data
 │
-└── public.performance_metrics    -- Time-series metrik performa
+├── public.performance_metrics    -- Time-series metrik performa
+├── public.alert_rules            -- Aturan alert (P1)
+├── public.alert_logs             -- Hasil evaluasi/notifikasi (P1)
+└── public.webhook_logs           -- Debug webhook (P1)
 ```
 
 ### 7.4 Row Level Security (RLS)
 
-Setiap admin hanya bisa membaca/menulis data sesuai dengan MicroSaaS yang di-assign padanya. Super Admin bypass semua RLS policy.
+RLS aktif pada tabel sensitif. Super Admin mendapat izin penuh melalui policy role. Operator Admin hanya mengakses MicroSaaS yang di-assign dan aksi yang diizinkan permission matrix. Finance Admin hanya membaca data keuangan dan metadata non-secret; tidak boleh mengubah subscription, plan, atau gateway. Audit log bersifat append-only, termasuk bagi Super Admin.
+
+Setiap Server Action memvalidasi identitas, role, dan scope. Service Role hanya digunakan pada server untuk operasi istimewa setelah pemeriksaan izin eksplisit; key tidak dikirim ke browser.
 
 ```sql
 -- Contoh RLS policy untuk operator admin
@@ -373,7 +392,7 @@ USING (
       ▼
 [Next.js App Router]
       │
-      ├── Server Actions ──────► [Supabase DB via Service Role]
+      ├── Server Actions ──────► [Supabase server client + JWT/RLS]
       │
       └── Client Components ──► [Supabase JS Client via Anon Key + RLS]
                                         │
@@ -421,7 +440,8 @@ dashboard-saas/
 │   │   │   ├── payment/
 │   │   │   │   ├── gateways/page.tsx
 │   │   │   │   ├── plans/page.tsx
-│   │   │   │   └── promo-codes/page.tsx
+│   │   │   │   ├── promo-codes/page.tsx
+│   │   │   │   └── webhook-logs/page.tsx
 │   │   │   │
 │   │   │   ├── performance/
 │   │   │   │   └── page.tsx
@@ -430,6 +450,7 @@ dashboard-saas/
 │   │   │   │   └── page.tsx
 │   │   │   │
 │   │   │   └── settings/
+│   │   │       ├── page.tsx               # Setup 2FA (P1)
 │   │   │       ├── team/page.tsx
 │   │   │       └── audit-log/page.tsx
 │   │   │
@@ -600,7 +621,7 @@ dashboard-saas/
 /                          ← Global Dashboard (Home)
 ├── /microsaas             ← Daftar semua MicroSaaS
 │   └── /[slug]            ← Detail MicroSaaS
-│       ├── /overview
+│       ├── /                    ← Overview pada /microsaas/[slug]
 │       ├── /users
 │       ├── /subscriptions
 │       ├── /revenue
@@ -617,13 +638,14 @@ dashboard-saas/
 ├── /payment               ← Payment Configuration
 │   ├── /gateways          ← Gateway config (Stripe, Midtrans)
 │   ├── /plans             ← Pricing Plans
-│   └── /promo-codes       ← Promo & Coupon
+│   ├── /promo-codes       ← Promo & Coupon
+│   └── /webhook-logs      ← Debug webhook (P1)
 │
 ├── /performance           ← Global Performance Monitoring
 │
 ├── /alerts                ← Notification & Alert Rules
 │
-└── /settings              ← Admin Settings
+└── /settings              ← Admin Settings + setup 2FA (P1)
     ├── /team              ← Admin Users & Roles
     └── /audit-log         ← Audit Log
 ```
@@ -634,10 +656,10 @@ dashboard-saas/
 
 Mengacu pada design system **Kinetic Obsidian** yang sudah didefinisikan di [`DESIGN.md`](../DESIGN.md):
 
-- **Base Canvas:** `#090D16` — dark, abyssal background
+- **Base Canvas:** `#0F131C` — dark, abyssal background
 - **Primary Accent:** `#00F2FE` (Electric Cyan) — active states, CTAs, live indicators
-- **Secondary Accent:** `#6366F1` (Electric Indigo) — secondary actions, chart series
-- **Success/Health:** `#10B981` (Neon Emerald) — positive metrics, uptime, revenue growth
+- **Secondary Accent:** `#3131C0` (Electric Indigo) — secondary actions, chart series
+- **Success/Health:** `#67F4B7` (Emerald) — positive metrics, uptime, revenue growth
 - **Font Stack:** Plus Jakarta Sans (headline) + Inter (body) + JetBrains Mono (metrics/code)
 - **Elevation:** Glassmorphism dengan `backdrop-filter: blur()` + gradient borders
 
@@ -648,35 +670,46 @@ Mengacu pada design system **Kinetic Obsidian** yang sudah didefinisikan di [`DE
 ### Fase 1 — MVP (P0 Features)
 
 - [ ] Admin dapat login dengan email+password (Supabase Auth)
-- [ ] Global dashboard menampilkan KPI agregat dari semua MicroSaaS
+- [ ] Global dashboard menampilkan lima KPI, kartu health per produk, dan grafik revenue 7/30/90 hari/custom
 - [ ] CRUD MicroSaaS berfungsi
-- [ ] Tabel user dengan search dan filter dasar
-- [ ] Aksi ban/unban dan reset password user berfungsi
+- [ ] Detail MicroSaaS memiliki lima tab; tab Performance MVP berisi uptime
+- [ ] Tabel user dengan search, filter, sorting, pagination, dan halaman detail lengkap
+- [ ] Aksi ban/unban, reset password, dan soft delete user berfungsi
 - [ ] Subscription management: lihat dan override plan
 - [ ] Dashboard revenue: MRR/ARR/transaksi
 - [ ] Konfigurasi payment gateway tersimpan dengan aman
 - [ ] CRUD pricing plan dan assign ke MicroSaaS
 - [ ] Audit log mencatat semua aksi admin
-- [ ] RBAC: Super Admin vs Operator Admin berjalan
+- [ ] RBAC tiga role, invite/revoke admin, assignment operator, dan isolasi RLS berjalan
+- [ ] Uptime 30 hari per MicroSaaS tersedia
+- [ ] Semua fitur MVP fungsional pada viewport ≥1280px
 
 ### Fase 2 — Growth (P1 Features)
 
 - [ ] Impersonate user
 - [ ] Churn prediction widget (trial expiring soon)
 - [ ] Alert rule engine dan notifikasi email/Slack
-- [ ] Performance monitoring (uptime, response time, error rate)
+- [ ] Monitoring lanjutan: response time p50/p90/p99, error rate, realtime active users
 - [ ] Promo code / coupon management
 - [ ] 2FA untuk admin login
-- [ ] Export CSV untuk user dan transaksi
+- [ ] Export CSV laporan pendapatan dan transaksi
+- [ ] User growth chart, activity feed realtime, konfigurasi/maintenance MicroSaaS
+- [ ] Detail transaksi, complimentary subscription, churn chart, cohort retention
+- [ ] Draft/publish harga dengan grandfathering, webhook log debugging, lihat/revoke session admin
+- [ ] Adaptasi tablet/mobile sesuai DESIGN.md
 
-### Fase 3 — Scale (P2+ Features)
+### Fase 3 — Scale (P2 Features)
 
 - [ ] Bulk actions pada user (bulk email, bulk export)
+- [ ] Quick actions promo/broadcast, riwayat alert lengkap, dan broadcast per MicroSaaS
 - [ ] Refund dari dashboard
 - [ ] Tax rate configuration
-- [ ] Webhook log debugging
-- [ ] Status page generator
+- [ ] Infinite scroll opsional dan export Excel laporan pendapatan
 - [ ] Performance: database slow query monitor
+
+### Fase 4 — Future (P3)
+
+- [ ] Status page generator
 
 ---
 
@@ -694,13 +727,15 @@ Mengacu pada design system **Kinetic Obsidian** yang sudah didefinisikan di [`DE
 
 ## 12. Milestones
 
-| Milestone | Target | Deliverable |
+| Milestone | Estimasi sprint | Deliverable |
 |---|---|---|
-| **M1 - Foundation** | Week 1-2 | Setup project, auth, DB schema, design system |
-| **M2 - Core Dashboard** | Week 3-4 | Global dashboard, MicroSaaS CRUD, user management dasar |
-| **M3 - Revenue & Payment** | Week 5-6 | Revenue dashboard, subscription management, payment config |
-| **M4 - Performance & Alerts** | Week 7-8 | Performance monitoring, alerting, audit log |
-| **M5 - Polish & Launch** | Week 9-10 | QA, RBAC hardening, 2FA, export features, deploy |
+| **M1 - Foundation & Security** | Sprint 1–3 | Foundation 76 SP + RBAC, admin/assignment, audit log 29 SP = 105 SP |
+| **M2 - Core Dashboard** | Sprint 4–6 | Dashboard, MicroSaaS, user management; 120 SP |
+| **M3 - Revenue & Payment** | Sprint 7–9 | Subscription, revenue, payment; 90 SP |
+| **M4 - Performance & Alerts** | Sprint 10–11 | Uptime, monitoring lanjutan, alerting; 45 SP |
+| **M5 - Polish & Launch** | Sprint 12 | 2FA 8 SP, QA, hardening, deploy |
+
+Baseline 368 SP, kapasitas 40 SP per sprint dua minggu: sekitar 24 minggu jika milestone berurutan. Epic dapat dipecah antar sprint. Estimasi mencakup task P0–P2 yang sudah diestimasi; gap requirement di BACKLOG.md belum termasuk dan dapat memperpanjang jadwal. MVP hanya dirilis setelah seluruh P0, termasuk uptime di M4, lolos verifikasi. Bagian P1/P2 boleh ditunda meskipun berada dalam milestone yang sama.
 
 ---
 
