@@ -38,6 +38,20 @@ browser. Client memvalidasi URL/key ketika dipanggil. Proxy hanya refresh sessio
 jika kedua public environment terisi; preview UI tetap dapat dibuka tanpa key.
 Proteksi route, login, dan pemeriksaan role di Server Action mengikuti story 4/32.
 
+## Deployment Netlify
+
+Isi `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_ANON_KEY` pada environment
+Netlify untuk build/deploy context yang dipakai. Keduanya sengaja masuk ke bundle
+browser Next.js. Gunakan anon/publishable key untuk variabel publik tersebut;
+service-role key tetap server-only. Akses data dibatasi oleh autentikasi dan RLS,
+sesuai [panduan API key Supabase](https://supabase.com/docs/guides/getting-started/api-keys).
+
+`netlify.toml` mengatur `SECRETS_SCAN_OMIT_KEYS` hanya untuk kedua variabel publik
+tersebut agar tidak memblokir deployment ketika nilainya ditemukan di output
+build atau dokumentasi. Pemindaian secret lainnya tetap aktif. Konfigurasi ini
+mengikuti [pengaturan secret scanning Netlify](https://docs.netlify.com/build/environment-variables/secrets-controller/#configure-secret-scanning).
+Setelah perubahan konfigurasi tersedia di branch deployment, jalankan deploy ulang.
+
 ## Supabase cloud (story 3)
 
 Project tujuan: `nbcgglhxqtgewtoeqbnf` di

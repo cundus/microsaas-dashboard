@@ -1,0 +1,4 @@
+[build.environment]
+  # Supabase browser configuration is intentionally included in Next.js bundles.
+  # Keep scanning enabled for service-role keys and all other secrets.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
