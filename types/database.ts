@@ -1505,6 +1505,14 @@ export type Database = {
           name: string;
         }[];
       };
+      get_user_growth_time_series: {
+        Args: { p_end: string; p_interval?: string; p_start: string };
+        Returns: {
+          new_users: number;
+          period_end: string;
+          period_start: string;
+        }[];
+      };
       is_project_member: { Args: { p_project: string }; Returns: boolean };
       is_project_member_for_user: {
         Args: { p_project_id: string; p_user_id: string };

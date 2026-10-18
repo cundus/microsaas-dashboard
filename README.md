@@ -329,6 +329,31 @@ diverifikasi memakai fixture sementara di state browser; fixture tidak ditulis
 ke cloud. Pemeriksaan data nyata menunggu produk tersedia dan review visual
 pengguna belum dilakukan. Referensi chart: [Recharts API](https://recharts.github.io/en-US/api/).
 
+Story 9 menambahkan grafik batang pertumbuhan pengguna di bawah tren pendapatan.
+Pilih 7/30/90 hari atau tanggal Custom, lalu pilih agregasi Harian, Mingguan,
+atau Bulanan. Rentang inklusif dibatasi 366 hari sampai hari ini, mengikuti WIB.
+Minggu dimulai Senin dan bulan mengikuti kalender; bucket pertama/terakhir
+hanya menghitung tanggal yang dipilih. Tooltip menampilkan batas bucket aktual
+dan jumlah pendaftaran, termasuk melalui navigasi tombol panah. Periode tanpa
+pendaftaran bernilai nol, disertai total periode dan pesan empty state.
+
+Akuisisi dihitung dari `users.created_at` per akun per produk, termasuk akun
+yang kemudian banned atau soft-deleted. Akun orang yang sama pada dua produk
+dihitung dua kali; ini bukan jumlah orang unik lintas produk atau pertumbuhan
+bersih pengguna aktif. Penghapusan fisik/perubahan `created_at` mengubah histori;
+query tidak merekonstruksi audit pengguna. Timestamp mendatang tidak dihitung.
+RPC invoker-rights mengikuti RLS pengguna: Super Admin seluruh produk, Operator
+hanya assignment, Finance ditolak dan grafik disembunyikan. Hanya agregat yang
+dikirim ke browser. Skeleton, refresh manual/polling lima menit, pemisahan data
+antarfilter, dan retry dengan data terakhir mengikuti pola Story 8.
+
+Jalankan `pnpm test:user-growth` untuk memeriksa batas WIB, agregasi kalender,
+periode tepi, zero-fill, validasi RPC, dan akses role. Migration cloud diterapkan
+dan tipe resmi digenerate ulang. Browser memverifikasi data nol cloud, filter
+preset/custom, agregasi, grafik nonzero/tooltip keyboard memakai fixture di state
+browser, serta kegagalan/pemulihan koneksi. Fixture tidak ditulis ke cloud;
+verifikasi data pengguna nyata dan review visual pengguna masih diperlukan.
+
 Build dapat dijalankan tanpa menyentuh output dev yang sedang aktif:
 `$env:NEXT_DIST_DIR = 'build'; pnpm build` pada PowerShell. Gunakan nilai yang
 sama ketika menjalankan `pnpm start`, lalu hapus environment tersebut sebelum

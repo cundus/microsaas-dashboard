@@ -434,11 +434,40 @@ masih perlu diverifikasi setelah cloud berisi produk.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-057 | Buat Server Action `getUserGrowthTimeSeries(range)` | 2 | ☐ |
-| T-058 | Buat komponen `UserGrowthBarChart` | 2 | ☐ |
-| T-059 | Integrasi date range filter ke chart | 1 | ☐ |
+| T-057 | Buat Server Action `getUserGrowthTimeSeries(range)` | 2 | ✅ |
+| T-058 | Buat komponen `UserGrowthBarChart` | 2 | ✅ |
+| T-059 | Integrasi date range filter ke chart | 1 | ✅ |
 
 **Total SP: 5**
+
+**Status: implementasi selesai; menunggu review visual pengguna (2026-10-19).**
+T-057–T-059 tersedia. Grafik batang Recharts menampilkan pendaftaran baru dengan
+agregasi harian, mingguan, dan bulanan sesuai FR-04. Filter 7/30/90 hari serta
+tanggal custom inklusif memakai validasi tanggal Story 8 (maksimal 366 hari,
+tanpa tanggal mendatang). Batas hari WIB, minggu mulai Senin, bulan kalender,
+dan pemotongan periode tepi diterapkan dalam RPC. Periode tanpa pendaftaran
+mendapat nilai nol. Total periode, tooltip rentang/nilai, navigasi keyboard,
+skeleton, refresh/polling lima menit, dan retry dengan data terakhir tersedia.
+Respons periode lama diabaikan ketika filter berubah.
+
+RPC invoker-rights `get_user_growth_time_series` mempertahankan RLS pengguna;
+Operator hanya menghitung assignment. Finance ditolak di Server Action dan RPC,
+serta tidak mendapat komponen grafik. Hanya rentang dan jumlah agregat dikirim
+ke browser. Akuisisi berdasarkan `users.created_at`, termasuk akun yang kemudian
+banned/soft-deleted; ini bukan pertumbuhan bersih pengguna aktif. Penghapusan
+fisik atau perubahan tanggal pendaftaran dapat mengubah histori, karena query
+tidak merekonstruksi audit pengguna. Timestamp pendaftaran mendatang diabaikan.
+Migration `20261019000300_user_growth.sql` diterapkan ke cloud SDSKanban dan
+tipe resmi digenerate ulang; tidak memasukkan seed/data contoh ke cloud.
+
+**Verifikasi:** `pnpm test:user-growth` (7 checks) dan seluruh regresi (50 checks
+total), lint, typecheck, serta production build lolos. Browser Super Admin
+memverifikasi data nol cloud, preset/custom, agregasi mingguan/bulanan, tooltip
+keyboard pada fixture nonzero sementara, serta error koneksi/data terakhir dan
+pemulihan setelah refresh. Fixture hanya berada di state browser. Desktop
+1280px tanpa overflow; Next.js MCP tanpa error kompilasi/runtime. Data nonzero,
+batas waktu, zero-fill, dan akses seluruh role diuji di PostgreSQL embedded.
+Verifikasi data pengguna nyata dan review visual pengguna masih diperlukan.
 
 ---
 
