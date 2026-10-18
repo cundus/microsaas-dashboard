@@ -387,13 +387,42 @@ cloud belum memiliki produk. Review visual pengguna belum dilakukan.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-052 | Install dan konfigurasi Recharts | 1 | ☐ |
-| T-053 | Buat Server Action `getRevenueTimeSeries(range)` | 3 | ☐ |
-| T-054 | Buat komponen `RevenueAreaChart` dengan Recharts | 3 | ☐ |
-| T-055 | Implementasi date range picker dan toggle period | 2 | ☐ |
-| T-056 | Styling chart: cyan gradient fill, grid hairlines, tooltip glassmorphism | 2 | ☐ |
+| T-052 | Install dan konfigurasi Recharts | 1 | ✅ |
+| T-053 | Buat Server Action `getRevenueTimeSeries(range)` | 3 | ✅ |
+| T-054 | Buat komponen `RevenueAreaChart` dengan Recharts | 3 | ✅ |
+| T-055 | Implementasi date range picker dan toggle period | 2 | ✅ |
+| T-056 | Styling chart: cyan gradient fill, grid hairlines, tooltip glassmorphism | 2 | ✅ |
 
 **Total SP: 11**
+
+**Status: implementasi selesai; menunggu review visual pengguna (2026-10-19).**
+T-052–T-056 tersedia. `RevenueAreaChart` memakai Recharts dengan seri per produk,
+gradient cyan/warna seri, grid hairline, tooltip glassmorphism tanggal/nilai,
+legenda, dan navigasi keyboard. Pilihan 7/30/90 hari dan tanggal kustom inklusif
+(maksimal 366 hari, tanpa tanggal mendatang) divalidasi di client, Server Action,
+dan RPC. Mata uang dipilih terpisah, tanpa konversi atau penjumlahan lintas mata
+uang. Skeleton, empty/zero state, refresh/polling lima menit, serta error/retry
+dengan data terakhir tersedia; pergantian periode tidak menampilkan data periode
+lama, dan respons yang terlambat dari periode lama diabaikan.
+
+RPC `get_revenue_time_series` mengembalikan MRR pada akhir setiap hari WIB;
+titik hari ini memakai waktu query. Subscription aktif dan normalisasi tahunan
+/12 konsisten dengan KPI. Before-image audit merekonstruksi pembatalan, perubahan
+harga/mata uang, dan penghapusan, dengan batas riwayat impor/service role yang
+sama seperti Story 6. RPC memeriksa admin aktif dan scope assignment secara
+eksplisit; Finance dapat membaca revenue. Hanya agregat dikirim ke browser.
+Migration `20261019000200_revenue_trend.sql` diterapkan ke cloud SDSKanban,
+tipe resmi digenerate ulang, tanpa seed/data contoh ke cloud.
+
+**Verifikasi:** `pnpm test:revenue` (10 checks), regresi auth/database/navigation/
+KPI/MicroSaaS (33 checks), lint, typecheck, dan production build lolos. Browser
+Super Admin memverifikasi filter preset/custom dan empty state cloud; fixture
+sementara di state browser memverifikasi tiga seri/gradient, tooltip hover dan
+keyboard, pemisahan IDR/USD, serta data terakhir dan pemulihan setelah fetch gagal.
+Layout desktop 1280px tanpa overflow dan Next.js MCP tanpa error kompilasi/runtime.
+Batas hari WIB, nonzero, histori perubahan/penghapusan, dan otorisasi diuji di
+PostgreSQL embedded. Grafik dengan data produk nyata serta review visual pengguna
+masih perlu diverifikasi setelah cloud berisi produk.
 
 ---
 

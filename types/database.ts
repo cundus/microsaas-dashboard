@@ -1495,6 +1495,16 @@ export type Database = {
           user_count: number;
         }[];
       };
+      get_revenue_time_series: {
+        Args: { p_end: string; p_start: string };
+        Returns: {
+          currency: string;
+          day: string;
+          microsaas_id: string;
+          mrr: number;
+          name: string;
+        }[];
+      };
       is_project_member: { Args: { p_project: string }; Returns: boolean };
       is_project_member_for_user: {
         Args: { p_project_id: string; p_user_id: string };

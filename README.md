@@ -296,6 +296,39 @@ multi-currency, nama panjang, layout 1280/1600px). Fixture tidak ditulis ke clou
 Detail produk nyata dan review visual pengguna masih perlu diverifikasi setelah
 produk tersedia. Migration cloud sudah diterapkan dan tipe resmi digenerate ulang.
 
+Story 8 menambahkan grafik MRR harian per MicroSaaS dengan Recharts pada dashboard.
+Gunakan 7/30/90 hari atau Custom lalu Terapkan; kedua tanggal dihitung inklusif,
+maksimal 366 hari hingga hari ini. Rentang divalidasi juga pada Server Action dan
+RPC. Tooltip menampilkan tanggal/nilai saat hover atau navigasi tombol panah.
+Setiap produk memiliki seri, gradient, dan legenda; ID produk menjaga seri tetap
+terpisah meskipun namanya sama. Bila ada beberapa mata uang, pilih satu melalui
+kontrol Mata uang. Nilai lintas mata uang tidak dijumlahkan atau dikonversi.
+
+MRR memakai subscription aktif dan harga tahunan /12 seperti KPI, bukan total
+transaksi dibayar. Titik harian adalah keadaan akhir hari Asia/Jakarta; titik
+hari ini dihitung pada waktu query. Sebuah rentang tetap dipakai sampai pengguna
+mengubah pilihan periode/tanggal. Produk tanpa subscription aktif mendapat nilai
+nol; scope tanpa produk menampilkan empty state. Data direfresh tiap lima menit,
+dengan skeleton awal serta retry/data terakhir saat refresh gagal. Data periode
+sebelumnya disembunyikan ketika periode baru dimuat.
+
+RPC `get_revenue_time_series` memakai definer rights untuk membaca before-image
+audit, memeriksa admin aktif dan assignment Operator secara eksplisit, serta
+mengembalikan hanya agregat. Finance bisa membaca seluruh revenue. Riwayat harga,
+status, mata uang, subscription/produk terhapus direkonstruksi memakai audit
+terurut. Keterbatasan audit Story 6 tetap berlaku: keadaan sebelum data impor
+atau mutasi tanpa before-image tidak bisa dipastikan. Produk baru tidak memberi
+MRR pada hari sebelum dibuat. Mata uang tanpa pendapatan sepanjang rentang
+tidak menghasilkan seri; produk tanpa revenue memakai fallback IDR bernilai nol.
+
+Jalankan `pnpm test:revenue` untuk pemeriksaan tanggal, agregasi historis, mata
+uang, batas hari WIB, dan otorisasi. Migration cloud sudah diterapkan dan tipe
+resmi digenerate ulang. Browser memverifikasi filter preset/custom dan empty
+state cloud. Grafik nonzero, tooltip keyboard, IDR/USD, dan pemulihan koneksi
+diverifikasi memakai fixture sementara di state browser; fixture tidak ditulis
+ke cloud. Pemeriksaan data nyata menunggu produk tersedia dan review visual
+pengguna belum dilakukan. Referensi chart: [Recharts API](https://recharts.github.io/en-US/api/).
+
 Build dapat dijalankan tanpa menyentuh output dev yang sedang aktif:
 `$env:NEXT_DIST_DIR = 'build'; pnpm build` pada PowerShell. Gunakan nilai yang
 sama ketika menjalankan `pnpm start`, lalu hapus environment tersebut sebelum

@@ -1,6 +1,7 @@
 ﻿import { KPICardGrid } from "@/modules/dashboard/components/KPICardGrid";
 
 import { MicroSaaSCardGrid } from "@/modules/dashboard/components/MicroSaaSCardGrid";
+import { RevenueAreaChart } from "@/modules/dashboard/components/RevenueAreaChart";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       </div>
       <KPICardGrid />
       <MicroSaaSCardGrid />
+      <RevenueAreaChart />
     </div>
   );
 }
