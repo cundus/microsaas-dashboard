@@ -73,7 +73,7 @@ status `inactive` untuk mempertahankan histori.
 
 Client browser: `lib/supabase/client.ts`; client server per request:
 `lib/supabase/server.ts`. `proxy.ts` memakai konvensi Next.js 16 untuk refresh
-cookie melalui `getClaims()` dan mencegah caching respons yang menulis session.
+cookie melalui `getUser()`, memvalidasi admin aktif, dan mencegah caching respons session.
 Pola mengikuti [panduan SSR Supabase](https://supabase.com/docs/guides/auth/server-side/creating-a-client).
 
 Setelah akses CLI tersedia dan perubahan cloud disetujui, gunakan workflow ini:
@@ -113,11 +113,50 @@ koneksi cloud. Migrations dan seed asli dijalankan; hanya interface identitas
 Supabase Auth yang dibuat sebagai stub. Pengujian meliputi isolasi RLS, eskalasi
 role, pencabutan akses, append-only audit, scope FK, dan constraint billing.
 PostgREST cloud sudah diuji untuk penolakan akses anonim. Pengujian login dan
-refresh session pengguna nyata mengikuti story 4.
+refresh session dengan akun admin cloud dilakukan setelah bootstrap akun di atas.
 `types/database.ts` dihasilkan CLI dari schema public cloud; karena project dipakai
 bersama, file ini juga berisi tipe tabel aplikasi lama. `pnpm db:types` memperbarui
 dan memformat file tersebut dari cloud.
 Kegagalan generate tidak menimpa file types yang sudah ada.
+
+## Authentication (STORY-004)
+
+`/login` menerima email/password lewat Server Action Supabase Auth. Session
+disimpan pada cookie Supabase SSR; `proxy.ts` memverifikasi identitas melalui
+Auth server dengan `getUser()` dan membaca role dari `admin_users` yang aktif.
+Seluruh route aplikasi, termasuk `/design-system`, membutuhkan akses admin.
+Route `/login`, `/401`, dan `/403` tersedia untuk login dan informasi kegagalan
+akses; aset statis dikecualikan. Akun tanpa session diarahkan ke login dengan
+parameter `next` internal yang divalidasi. Akun tanpa admin aktif diarahkan ke 403. Konfigurasi Supabase wajib tersedia; tidak ada bypass auth untuk preview.
+
+Global client state menggunakan **Zustand** (`lib/auth/store.ts`), diinisialisasi
+dari hasil validasi server melalui `AuthProvider` di layout `(dashboard)`.
+`useAuth()` mengembalikan profil admin (id, email, nama, role) atau `null` setelah
+logout. Store dibuat per provider agar tidak berbagi identitas antar request;
+token/password tidak disalin ke store atau localStorage. Pola mengikuti
+[panduan Next.js Zustand](https://zustand.docs.pmnd.rs/learn/guides/nextjs).
+Event Auth serta fokus kembali ke tab memicu validasi ulang. Gunakan
+`requireAdmin()` di setiap Server Action/query fitur berikutnya dan tetap
+andalkan RLS untuk otorisasi data; state client hanya untuk tampilan.
+
+Logout mencabut session perangkat saat ini (`scope: local`), membersihkan cookie,
+menginvalidasi cache layout, lalu kembali ke login. Kegagalan login/logout
+ditampilkan pada form. Route group `(dashboard)` menjaga layout terproteksi;
+sidebar/header lengkap mengikuti STORY-005.
+
+```sh
+pnpm test:auth
+```
+
+Pengujian otomatis memeriksa identitas, tiga role, akun nonaktif/non-admin,
+kegagalan database, redirect internal, dan isolasi/reset store. Untuk verifikasi
+cloud: buat akun Auth dengan email terkonfirmasi dan password, jalankan SQL
+bootstrap di atas, lalu login melalui `/login`. Muat ulang halaman untuk
+memastikan cookie persisten; buka `/design-system` secara langsung; logout lalu
+coba akses URL tersebut kembali. Akun Auth tanpa baris admin atau dengan
+`is_active = false` harus masuk ke `/403` dan tetap bisa logout. Uji ketiga role
+dengan akun yang memang disediakan untuk pengujian. Tidak ada akun atau password
+default yang dibuat aplikasi.
 
 ## Tooling dan verifikasi
 

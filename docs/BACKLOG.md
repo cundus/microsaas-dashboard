@@ -170,19 +170,47 @@ yang dijalankan.
 - Halaman login dengan email + password
 - Session persistent via Supabase Auth cookie
 - Redirect ke login jika tidak ter-autentikasi
-- Role admin ter-load di session context
+- Role admin ter-load di global state Zustand melalui hook `useAuth()`
 - Middleware proteksi semua route `/` kecuali `/login`
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-032 | Buat halaman `/login` dengan form email + password | 2 | ☐ |
-| T-033 | Implementasi Supabase Auth sign-in logic (Server Action) | 2 | ☐ |
-| T-034 | Buat middleware Next.js untuk proteksi route | 2 | ☐ |
-| T-035 | Buat `AuthContext` / hook `useAuth()` untuk akses session di client | 2 | ☐ |
-| T-036 | Implementasi logout dan invalidate session | 1 | ☐ |
-| T-037 | Buat halaman error: 401 Unauthorized, 403 Forbidden | 1 | ☐ |
+| T-032 | Buat halaman `/login` dengan form email + password | 2 | ✅ |
+| T-033 | Implementasi Supabase Auth sign-in logic (Server Action) | 2 | ✅ |
+| T-034 | Buat middleware Next.js untuk proteksi route (`proxy.ts` pada Next.js 16) | 2 | ✅ |
+| T-035 | Buat store Zustand / hook `useAuth()` untuk akses profil dan role session di client | 2 | ✅ |
+| T-036 | Implementasi logout dan invalidate session | 1 | ✅ |
+| T-037 | Buat halaman error: 401 Unauthorized, 403 Forbidden | 1 | ✅ |
 
 **Total SP: 10**
+
+**Status: ✅ Selesai dan diterima pengguna (2026-10-18).** Pengujian akun cloud
+nyata tetap belum dilakukan seperti dicatat pada bagian verifikasi.
+
+**Implementasi (2026-10-18):** T-032–T-037 tersedia. Login memakai Server Action,
+validasi input server, pesan error generik, dan redirect internal yang divalidasi.
+Session memakai cookie Supabase SSR. Proxy memeriksa `getUser()` dan profil aktif
+di `admin_users`; akun non-admin/nonaktif diarahkan ke `/403`. Route aplikasi
+terproteksi, termasuk preview design system. `/login`, `/401`, dan `/403` adalah
+route publik untuk login/informasi akses; aset statis dikecualikan. Bypass saat
+env belum diisi dihapus. Halaman 401/403 adalah halaman informasi; request tanpa
+session ke dashboard tetap redirect ke login sesuai acceptance criteria.
+
+Global state memakai Zustand sesuai arahan pengguna, store terisolasi per
+provider/request dengan profil awal dari server dan hook `useAuth()`. Password
+dan token tidak disimpan dalam store/localStorage. Logout perangkat saat ini,
+invalidasi layout, revalidasi ketika fokus tab, dan listener event Auth tersedia.
+Layout `(dashboard)` memuat provider; shell navigasi lengkap tetap STORY-005.
+Bootstrap admin pertama dan checklist pengujian cloud tersedia di README.
+
+**Verifikasi:** `pnpm test:auth` menguji validasi session/role, penolakan akun
+nonaktif/non-admin, kegagalan query, redirect aman, dan isolasi/reset Zustand.
+Enam tes auth, delapan checks database, lint, typecheck, format check, dan build
+lolos. Smoke test HTTP production membuktikan redirect anonim dari `/`,
+`/design-system`, route tidak dikenal, dan `/api/private` ke login dengan `next`
+serta header no-store; halaman login/401/403 dan aset statis tampil normal.
+Pengujian login/logout dan persistensi cookie menggunakan akun admin cloud nyata
+serta penerimaan visual belum dilakukan; aplikasi tidak membuat akun default.
 
 ---
 
