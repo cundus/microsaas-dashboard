@@ -1,5 +1,7 @@
 ﻿import { KPICardGrid } from "@/modules/dashboard/components/KPICardGrid";
 
+import { MicroSaaSCardGrid } from "@/modules/dashboard/components/MicroSaaSCardGrid";
+
 export default function Home() {
   return (
     <div className="space-y-6">
@@ -10,6 +12,7 @@ export default function Home() {
         </p>
       </div>
       <KPICardGrid />
+      <MicroSaaSCardGrid />
     </div>
   );
 }

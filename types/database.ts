@@ -1478,6 +1478,23 @@ export type Database = {
           value: number;
         }[];
       };
+      get_microsaas_list: {
+        Args: { p_slug?: string };
+        Returns: {
+          checked_at: string;
+          currency: string;
+          description: string;
+          id: string;
+          latest_uptime_percent: number;
+          logo_url: string;
+          mrr: number;
+          name: string;
+          slug: string;
+          status: string;
+          uptime_percent: number;
+          user_count: number;
+        }[];
+      };
       is_project_member: { Args: { p_project: string }; Returns: boolean };
       is_project_member_for_user: {
         Args: { p_project_id: string; p_user_id: string };

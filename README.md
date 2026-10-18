@@ -271,6 +271,31 @@ data terakhir, pemulihan setelah retry, serta layout desktop 1280px. Skenario
 nonzero, mata uang, dan role lainnya diuji di PostgreSQL embedded. Review visual
 pengguna tetap diperlukan.
 
+Story 7 menambahkan kartu status per produk di dashboard. `getMicroSaaSList()`
+memanggil RPC invoker-rights yang mengikuti RLS: Operator hanya assignment,
+Finance hanya ringkasan produk dan MRR, tanpa user count maupun telemetri.
+Pengguna soft-deleted dikecualikan. MRR memakai definisi Story 6 dan setiap mata
+uang tetap terpisah. Klik kartu membuka ringkasan server di `/microsaas/[slug]`;
+produk tidak ditemukan atau tidak terakses menampilkan not-found. Lima tab detail
+lengkap belum termasuk Story 7.
+
+Uptime 30 hari adalah rata-rata sampel `performance_metrics` untuk endpoint `/`,
+tanpa pembobotan durasi dan tanpa menganggap celah monitoring sebagai uptime.
+Health memakai sampel terbaru endpoint `/`: Healthy >=99,5%, Degraded >0 dan
+<99,5%, Down 0%. Tanpa sampel atau sampel lebih tua dari 15 menit tampil Unknown;
+status registrasi inactive ditampilkan terpisah. Ambang health adalah baseline
+implementasi karena PRD belum menetapkannya. Pengumpul telemetri tidak termasuk
+story ini; integrasi harus memasok sampel endpoint `/` secara berkala.
+
+Kartu memiliki fallback logo, skeleton, empty state, refresh/polling lima menit,
+dan retry yang mempertahankan data terakhir. Jalankan `pnpm test:microsaas`
+untuk memeriksa agregasi, health, dan otorisasi. Browser telah memverifikasi empty
+state cloud, refresh, kegagalan/pemulihan koneksi, not-found detail, serta kartu
+dengan fixture sementara di state browser (empat health state, logo gagal,
+multi-currency, nama panjang, layout 1280/1600px). Fixture tidak ditulis ke cloud.
+Detail produk nyata dan review visual pengguna masih perlu diverifikasi setelah
+produk tersedia. Migration cloud sudah diterapkan dan tipe resmi digenerate ulang.
+
 Build dapat dijalankan tanpa menyentuh output dev yang sedang aktif:
 `$env:NEXT_DIST_DIR = 'build'; pnpm build` pada PowerShell. Gunakan nilai yang
 sama ketika menjalankan `pnpm start`, lalu hapus environment tersebut sebelum

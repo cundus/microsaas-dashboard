@@ -332,12 +332,44 @@ tercantum di README.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-048 | Buat query `getMicroSaaSList()` dengan data agregat | 3 | ☐ |
-| T-049 | Buat komponen `MicroSaaSCard` dengan semua informasi | 2 | ☐ |
-| T-050 | Implementasi status health indicator logic | 2 | ☐ |
-| T-051 | Buat grid layout responsif untuk MicroSaaS cards | 1 | ☐ |
+| T-048 | Buat query `getMicroSaaSList()` dengan data agregat | 3 | ✅ |
+| T-049 | Buat komponen `MicroSaaSCard` dengan semua informasi | 2 | ✅ |
+| T-050 | Implementasi status health indicator logic | 2 | ✅ |
+| T-051 | Buat grid layout responsif untuk MicroSaaS cards | 1 | ✅ |
 
 **Total SP: 8**
+
+**Status: implementasi selesai; menunggu review visual pengguna (2026-10-19).**
+T-048–T-051 tersedia. Dashboard menampilkan satu kartu per produk dengan logo
+(fallback bila kosong/gagal), nama, pengguna non-deleted, MRR per mata uang,
+uptime 30 hari, health badge, serta status produk nonaktif yang terpisah.
+MRR mengikuti Story 6: subscription active, harga tahunan /12. Grid memakai
+1/2/3 kolom, skeleton awal, empty state sesuai scope, refresh manual/polling
+5 menit, serta error/retry dengan data terakhir.
+
+RPC `get_microsaas_list` memakai invoker rights dan RLS yang ada. Operator hanya
+mendapat produk assignment; Finance tidak menerima jumlah pengguna ataupun
+telemetri performa. Akun anonim/non-admin/nonaktif ditolak. Uptime adalah rata-rata
+sampel endpoint `/` dalam 30 hari (bukan estimasi berbobot waktu); health memakai
+sampel terbaru endpoint tersebut: Healthy ≥99,5%, Degraded >0 dan <99,5%, Down 0%.
+Sampel kosong atau lebih dari 15 menit ditandai Unknown. Ambang ini merupakan
+baseline implementasi karena PRD belum mendefinisikan threshold health produk.
+
+Klik kartu membuka `/microsaas/[slug]` dengan ringkasan produk yang dibaca ulang
+di server melalui RLS; slug tidak dikenal/tidak terakses menghasilkan not-found.
+Lima tab detail lengkap tetap mengikuti story detail MicroSaaS berikutnya.
+Migration `20261019000100_microsaas_status.sql` diterapkan ke cloud SDSKanban,
+tipe resmi digenerate ulang, tanpa memasukkan seed/data contoh ke cloud.
+
+**Verifikasi:** `pnpm test:microsaas` (7 checks), regresi auth/database/navigation/KPI
+(26 checks), lint, typecheck, dan production build lolos. Browser dengan sesi
+Super Admin memverifikasi skeleton/empty state cloud, refresh, error koneksi,
+data terakhir, pemulihan, dan not-found detail. Data simulasi hanya di state browser
+memverifikasi empat health badge, multi-currency, nama panjang, fallback logo,
+serta 2 kolom pada 1280px tanpa overflow dan 3 kolom pada 1600px. Next.js MCP
+melaporkan tanpa error kompilasi/runtime. Agregasi nonzero dan pembatasan role
+diuji di PostgreSQL embedded; navigasi detail produk nyata belum diuji karena
+cloud belum memiliki produk. Review visual pengguna belum dilakukan.
 
 ---
 
