@@ -1,7 +1,7 @@
 # Product Backlog
 ## Multi-MicroSaaS Admin Dashboard
 
-**Versi:** 1.1.0
+**Versi:** 1.1.1
 **Terakhir Diupdate:** 2026-10-18  
 **Referensi:** [PRD.md](./PRD.md)
 
@@ -42,21 +42,24 @@
 **Acceptance Criteria:**
 - Next.js 14+ dengan App Router dan TypeScript terkonfigurasi
 - ESLint + Prettier + Husky pre-commit hook aktif
-- Tailwind CSS + shadcn/ui terintegrasi
+- Tailwind CSS v4 (CSS-first di `app/globals.css`) + shadcn/ui terintegrasi
+- Folder sumber langsung di root tanpa `src/`; alias `@/*` mengarah ke `./*`
 - Environment variables terdefinisi (`.env.local.example`)
 - `README.md` dengan instruksi setup lengkap
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-001 | Init Next.js 14+ (App Router) dengan TypeScript | 1 | ☐ |
-| T-002 | Setup Tailwind CSS + shadcn/ui | 1 | ☐ |
-| T-003 | Konfigurasi font: Plus Jakarta Sans, Inter, JetBrains Mono | 1 | ☐ |
-| T-004 | Setup ESLint + Prettier + Husky | 1 | ☐ |
-| T-005 | Buat `.env.local.example` dan dokumentasi env vars | 1 | ☐ |
-| T-006 | Setup folder structure (app/, components/, lib/, types/) | 1 | ☐ |
-| T-007 | Konfigurasi path alias (`@/`) di tsconfig | 1 | ☐ |
+| T-001 | Init Next.js 14+ (App Router) dengan TypeScript | 1 | ✅ |
+| T-002 | Setup Tailwind CSS v4 + shadcn/ui (`components.json`, CSS-first) | 1 | ✅ |
+| T-003 | Konfigurasi font: Plus Jakarta Sans, Inter, JetBrains Mono | 1 | ✅ |
+| T-004 | Setup ESLint + Prettier + Husky | 1 | ✅ |
+| T-005 | Buat `.env.local.example` dan dokumentasi env vars | 1 | ✅ |
+| T-006 | Setup folder structure di root (app/, modules/, components/, lib/, hooks/, types/), tanpa src/ | 1 | ☐ |
+| T-007 | Konfigurasi path alias (`@/` → root `./*`) di tsconfig | 1 | ✅ |
 
 **Total SP: 7**
+
+**Bukti implementasi (2026-10-18):** starter Next.js 16.4.2, App Router di `app/`, TypeScript strict, dan alias `@/*` → `./*` tersedia. Tailwind v4 terhubung ke shadcn/ui melalui `components.json`, token semantik CSS, `cn()`, dan Button awal yang dipakai halaman starter. Tiga font Kinetic Obsidian dimuat melalui `next/font`. Prettier, ESLint, Husky/lint-staged, contoh environment, dan panduan README tersedia. Lint, format check, typecheck, dan build lolos; hook pre-commit diuji dengan staging terisolasi untuk menolak TypeScript invalid dan merapikan kode valid. T-006 tetap terbuka karena folder modul/shared lain belum tersedia; STORY-001 belum selesai seluruhnya.
 
 ---
 
@@ -74,9 +77,9 @@
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-008 | Definisikan color tokens sebagai CSS variables di `globals.css` | 2 | ☐ |
-| T-009 | Buat `tailwind.config.ts` dengan extend colors, fonts, borderRadius | 2 | ☐ |
-| T-010 | Buat komponen `Button` (primary, secondary, destructive, ghost) | 2 | ☐ |
+| T-008 | Definisikan color tokens sebagai CSS variables di `app/globals.css` | 2 | 🔄 |
+| T-009 | Konfigurasi Tailwind v4 dengan `@theme inline` untuk colors, fonts, borderRadius di `app/globals.css` | 2 | 🔄 |
+| T-010 | Buat komponen `Button` (primary, secondary, destructive, ghost) | 2 | ✅ |
 | T-011 | Buat komponen `Card` dengan glassmorphism style | 2 | ☐ |
 | T-012 | Buat komponen `Badge` / `Chip` (status, pill-shaped) | 1 | ☐ |
 | T-013 | Buat komponen `StatCard` untuk metric display | 2 | ☐ |
@@ -84,6 +87,8 @@
 | T-015 | Buat utility CSS class untuk glassmorphism (`.glass-panel`) | 1 | ☐ |
 
 **Total SP: 17**
+
+**Progress:** token semantik shadcn, tiga font, radius dasar, dan Button tersedia. T-008/T-009 belum selesai sampai seluruh token canonical DESIGN.md dipetakan; komponen dasar lain dan utility glassmorphism tetap mengikuti task masing-masing.
 
 ---
 

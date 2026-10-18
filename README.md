@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multi-MicroSaaS Admin Dashboard
 
-## Getting Started
+Fondasi Next.js App Router + TypeScript untuk dashboard admin MicroSaaS.
+Requirement: [PRD](docs/PRD.md), [backlog](docs/BACKLOG.md), dan [Kinetic Obsidian](DESIGN.md).
 
-First, run the development server:
+## Setup lokal
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Gunakan Node.js 22 LTS dan pnpm 9.15.9 (lihat `packageManager`).
+
+```sh
+pnpm install --frozen-lockfile
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Salin contoh environment di PowerShell:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+Copy-Item .env.local.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sh
+pnpm dev
+```
 
-## Learn More
+Buka <http://localhost:3000>. Halaman masih starter; integrasi Supabase dan fitur
+bisnis mengikuti backlog. Environment boleh kosong sampai modul terkait dibangun.
 
-To learn more about Next.js, take a look at the following resources:
+## Environment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable                        | Akses          | Kegunaan                                                             |
+| ------------------------------- | -------------- | -------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Browser/server | URL project Supabase                                                 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser/server | Anon key; akses data harus dibatasi RLS                              |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server saja    | Operasi istimewa setelah validasi role dan scope                     |
+| `GATEWAY_ENCRYPTION_KEY`        | Server saja    | Dicadangkan untuk enkripsi secret gateway: 32 byte acak dalam base64 |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Jangan commit `.env.local`. Service role dan kunci enkripsi tidak boleh dikirim ke
+browser. Belum ada pembacaan atau validasi runtime environment pada fondasi ini.
 
-## Deploy on Vercel
+## Tooling dan verifikasi
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+pnpm lint
+pnpm typecheck
+pnpm format:check
+pnpm build
+pnpm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`typecheck` menjalankan Next.js typegen sebelum TypeScript, termasuk pada checkout
+baru. `pnpm format` merapikan source/config; `docs/`, `DESIGN.md`, lockfile, dan
+file hasil generate dikecualikan. `pnpm build` membutuhkan akses Google Fonts
+untuk mengunduh font; hasil build melayani font tersebut secara lokal.
+
+Husky aktif melalui script `prepare` saat dependency diinstal. Hook pre-commit
+menjalankan lint-staged: ESLint dan Prettier pada source JavaScript/TypeScript,
+serta Prettier pada JSON/CSS/Markdown/YAML yang tidak diabaikan. CI tetap perlu
+menjalankan semua perintah verifikasi.
+
+## UI dan struktur
+
+- Tailwind v4 memakai CSS-first di `app/globals.css`; integrasi Turbopack tetap
+  melalui `next.config.ts`.
+- shadcn/ui dikonfigurasi di `components.json`, tanpa `tailwind.config.ts`.
+  Komponen awal `components/ui/button.tsx` menggunakan helper `lib/utils.ts`.
+- Font: Plus Jakarta Sans (`font-display`), Inter (`font-sans`), JetBrains Mono
+  (`font-mono`), dimuat melalui `next/font`. Tema gelap aktif tetap.
+- Folder sumber langsung di root, tanpa `src/`; `@/` mengarah ke root proyek.
+  Modul dan komponen lain dibuat sesuai task, bukan sekaligus pada setup ini.
+
+Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
+[Husky](https://typicode.github.io/husky/get-started.html), dan
+[Prettier](https://prettier.io/docs/install).

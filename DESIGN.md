@@ -128,11 +128,13 @@ spacing:
 
 ## Document Contract
 
-Version: 1.1.0 · Updated: 2026-10-18.
+Version: 1.1.1 · Updated: 2026-10-18.
 
 [PRD](docs/PRD.md) defines scope, priorities, and permissions. [BACKLOG](docs/BACKLOG.md) tracks delivery. This document defines visual tokens and layout behavior. The YAML front matter is the canonical color palette; prose and implementation must use those values. See PRD §7.2 for the shadcn mapping: action colors use container tokens, while tonal text uses the corresponding foreground tokens.
 
 Desktop ≥1280px is the P0 acceptance target. Tablet (768–1279px) and mobile (360–767px) adaptations are P1. Dark mode is the default and only theme for v1.
+
+Implementation uses Tailwind CSS v4 with CSS-first configuration in root-level `app/globals.css` (`@import "tailwindcss"` and `@theme inline`). Map semantic CSS variables to `--color-*`, `--font-*`, and `--radius-*` theme variables; retain the canonical HEX values above. There is no `tailwind.config.ts` requirement and no `src/` directory. Owned shadcn/ui components live in `components/ui/`; `@/` resolves to the project root. In `components.json`, use an empty `tailwind.config` and `tailwind.css: "app/globals.css"`.
 
 ## Brand & Style
 

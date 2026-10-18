@@ -1,7 +1,7 @@
 # Product Requirements Document
 ## Multi-MicroSaaS Admin Dashboard
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 **Tanggal:** 2026-10-18  
 **Status:** Draft  
 **Owner:** Admin / Founder  
@@ -286,7 +286,7 @@ agar saya bisa merespons insiden dengan cepat.
 | Layer | Teknologi |
 |---|---|
 | **Frontend** | Next.js 14+ (App Router), TypeScript |
-| **UI Base** | Tailwind CSS v3 |
+| **UI Base** | Tailwind CSS v4 (konfigurasi CSS-first) |
 | **UI Kit** | shadcn/ui (Radix UI primitives + Tailwind variants) |
 | **Design System** | Kinetic Obsidian — custom token layer di atas shadcn/ui |
 | **Database** | Supabase (PostgreSQL) — tersentralisasi |
@@ -301,7 +301,7 @@ agar saya bisa merespons insiden dengan cepat.
 
 ### 7.2 shadcn/ui Component Kit
 
-shadcn/ui digunakan sebagai **fondasi komponen yang di-own langsung** (bukan dependency eksternal). Setiap komponen di-copy ke `src/components/ui/` dan di-extend dengan token Kinetic Obsidian.
+shadcn/ui digunakan sebagai **fondasi komponen yang di-own langsung** (bukan dependency eksternal). Setiap komponen di-copy ke `components/ui/` di root proyek dan di-extend dengan token Kinetic Obsidian. Semua folder sumber berada di root, tanpa folder `src/`; alias `@/*` mengarah ke `./*`.
 
 **Komponen shadcn/ui yang digunakan:**
 
@@ -318,7 +318,9 @@ shadcn/ui digunakan sebagai **fondasi komponen yang di-own langsung** (bukan dep
 
 **Kustomisasi Kinetic Obsidian di atas shadcn:**
 
-Nilai HEX di front matter `DESIGN.md` menjadi acuan tunggal. Konversi ke HSL untuk Tailwind v3 harus mempertahankan warna tersebut.
+Nilai HEX di front matter `DESIGN.md` menjadi acuan tunggal. Tailwind v4 menggunakan `@import "tailwindcss"` dan `@theme inline` pada `app/globals.css` untuk memetakan CSS variables ke utility warna, font, dan radius. Gunakan nilai warna CSS langsung (`var(--primary)`), tanpa pembungkus `hsl()` kecuali variabelnya memang berisi kanal HSL. Tidak diperlukan `tailwind.config.ts`.
+
+Starter saat ini memakai `@tailwindcss/turbopack` melalui `next.config.ts`; pertahankan integrasi tersebut selama lint dan build lolos. Konfigurasi shadcn/ui nantinya menggunakan `tailwind.config: ""`, `tailwind.css: "app/globals.css"`, dan alias komponen di root. Contoh mapping warna: `--color-primary: var(--primary)` di dalam `@theme inline` menghasilkan utility `bg-primary`.
 
 | shadcn variable | Token DESIGN.md | HEX |
 |---|---|---|
@@ -403,197 +405,196 @@ USING (
 
 ### 7.6 Folder Structure (Modular)
 
-Proyek menggunakan **feature-based modular structure** di dalam Next.js App Router. Setiap modul memiliki folder mandiri yang berisi routes, komponen, actions, hooks, dan types-nya sendiri — menghindari struktur flat yang tidak scalable.
+Proyek menggunakan **feature-based modular structure** dengan `app/`, `modules/`, `components/`, `lib/`, `hooks/`, dan `types/` langsung di root, tanpa lapisan `src/`. Routes berada di `app/`; logic bisnis, komponen spesifik, actions, queries, hooks, dan types tiap fitur berada di `modules/`. Pohon berikut adalah struktur target; folder dan file dibuat ketika task terkait dikerjakan.
 
 ```
 dashboard-saas/
-├── src/
-│   ├── app/                              # Next.js App Router
-│   │   ├── (auth)/
-│   │   │   └── login/
-│   │   │       └── page.tsx
-│   │   ├── (dashboard)/                  # Protected routes group
-│   │   │   ├── layout.tsx                # AppShell (sidebar + header)
-│   │   │   ├── page.tsx                  # /  → Global Dashboard
-│   │   │   │
-│   │   │   ├── microsaas/
-│   │   │   │   ├── page.tsx              # /microsaas
-│   │   │   │   └── [slug]/
-│   │   │   │       ├── layout.tsx        # Tab navigation
-│   │   │   │       ├── page.tsx          # /microsaas/[slug] → Overview
-│   │   │   │       ├── users/page.tsx
-│   │   │   │       ├── subscriptions/page.tsx
-│   │   │   │       ├── revenue/page.tsx
-│   │   │   │       └── performance/page.tsx
-│   │   │   │
-│   │   │   ├── users/
-│   │   │   │   ├── page.tsx              # /users
-│   │   │   │   └── [userId]/page.tsx     # /users/[userId]
-│   │   │   │
-│   │   │   ├── subscriptions/
-│   │   │   │   └── page.tsx
-│   │   │   │
-│   │   │   ├── revenue/
-│   │   │   │   ├── page.tsx
-│   │   │   │   └── transactions/page.tsx
-│   │   │   │
-│   │   │   ├── payment/
-│   │   │   │   ├── gateways/page.tsx
-│   │   │   │   ├── plans/page.tsx
-│   │   │   │   ├── promo-codes/page.tsx
-│   │   │   │   └── webhook-logs/page.tsx
-│   │   │   │
-│   │   │   ├── performance/
-│   │   │   │   └── page.tsx
-│   │   │   │
-│   │   │   ├── alerts/
-│   │   │   │   └── page.tsx
-│   │   │   │
-│   │   │   └── settings/
-│   │   │       ├── page.tsx               # Setup 2FA (P1)
-│   │   │       ├── team/page.tsx
-│   │   │       └── audit-log/page.tsx
-│   │   │
-│   │   └── api/                          # Route Handlers (webhook receivers, etc.)
-│   │       └── webhooks/
-│   │           ├── stripe/route.ts
-│   │           └── midtrans/route.ts
-│   │
-│   ├── modules/                          # Feature modules (core business logic)
-│   │   ├── dashboard/
-│   │   │   ├── actions.ts                # Server Actions: getGlobalKPIs, etc.
-│   │   │   ├── queries.ts                # Supabase queries
-│   │   │   ├── types.ts                  # TypeScript types modul ini
-│   │   │   └── components/
-│   │   │       ├── KPICardGrid.tsx
-│   │   │       ├── RevenueAreaChart.tsx
-│   │   │       ├── MicroSaaSStatusGrid.tsx
-│   │   │       └── ActivityFeed.tsx
+├── app/                              # Next.js App Router
+│   ├── (auth)/
+│   │   └── login/
+│   │       └── page.tsx
+│   ├── (dashboard)/                  # Protected routes group
+│   │   ├── layout.tsx                # AppShell (sidebar + header)
+│   │   ├── page.tsx                  # /  → Global Dashboard
 │   │   │
 │   │   ├── microsaas/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── MicroSaaSTable.tsx
-│   │   │       ├── MicroSaaSCard.tsx
-│   │   │       ├── MicroSaaSForm.tsx
-│   │   │       └── MicroSaaSConfigForm.tsx
+│   │   │   ├── page.tsx              # /microsaas
+│   │   │   └── [slug]/
+│   │   │       ├── layout.tsx        # Tab navigation
+│   │   │       ├── page.tsx          # /microsaas/[slug] → Overview
+│   │   │       ├── users/page.tsx
+│   │   │       ├── subscriptions/page.tsx
+│   │   │       ├── revenue/page.tsx
+│   │   │       └── performance/page.tsx
 │   │   │
 │   │   ├── users/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── UserTable.tsx
-│   │   │       ├── UserDetailCard.tsx
-│   │   │       ├── UserActionsMenu.tsx
-│   │   │       └── BulkActionBar.tsx
+│   │   │   ├── page.tsx              # /users
+│   │   │   └── [userId]/page.tsx     # /users/[userId]
 │   │   │
 │   │   ├── subscriptions/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── SubscriptionTable.tsx
-│   │   │       ├── SubscriptionOverrideModal.tsx
-│   │   │       └── ChurnRiskTable.tsx
+│   │   │   └── page.tsx
 │   │   │
 │   │   ├── revenue/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── RevenueMetricCards.tsx
-│   │   │       ├── RevenueBreakdownTable.tsx
-│   │   │       ├── RevenueDonutChart.tsx
-│   │   │       └── TransactionTable.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── transactions/page.tsx
 │   │   │
 │   │   ├── payment/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── GatewayConfigForm.tsx
-│   │   │       ├── PlanForm.tsx
-│   │   │       ├── PlanPreviewCard.tsx
-│   │   │       ├── PromoCodeForm.tsx
-│   │   │       └── WebhookLogTable.tsx
+│   │   │   ├── gateways/page.tsx
+│   │   │   ├── plans/page.tsx
+│   │   │   ├── promo-codes/page.tsx
+│   │   │   └── webhook-logs/page.tsx
 │   │   │
 │   │   ├── performance/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── UptimeTimeline.tsx
-│   │   │       ├── ResponseTimeChart.tsx
-│   │   │       └── ErrorRateChart.tsx
+│   │   │   └── page.tsx
 │   │   │
 │   │   ├── alerts/
-│   │   │   ├── actions.ts
-│   │   │   ├── queries.ts
-│   │   │   ├── types.ts
-│   │   │   └── components/
-│   │   │       ├── AlertRuleForm.tsx
-│   │   │       ├── AlertRuleTable.tsx
-│   │   │       └── NotificationBell.tsx
+│   │   │   └── page.tsx
 │   │   │
-│   │   └── admin/
-│   │       ├── actions.ts
-│   │       ├── queries.ts
-│   │       ├── types.ts
-│   │       └── components/
-│   │           ├── AdminTable.tsx
-│   │           ├── InviteAdminModal.tsx
-│   │           └── AuditLogTable.tsx
+│   │   └── settings/
+│   │       ├── page.tsx               # Setup 2FA (P1)
+│   │       ├── team/page.tsx
+│   │       └── audit-log/page.tsx
 │   │
-│   ├── components/                       # Shared / UI components
-│   │   ├── ui/                           # shadcn/ui components (owned, customized)
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── table.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── select.tsx
-│   │   │   ├── skeleton.tsx
-│   │   │   ├── sheet.tsx
-│   │   │   ├── sonner.tsx
-│   │   │   └── ...                       # semua shadcn components
-│   │   │
-│   │   ├── layout/                       # Shell & navigation
-│   │   │   ├── AppShell.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   ├── Header.tsx
-│   │   │   └── Breadcrumb.tsx
-│   │   │
-│   │   └── shared/                       # Reusable cross-module components
-│   │       ├── StatCard.tsx
-│   │       ├── ConfirmDialog.tsx
-│   │       ├── DataTable.tsx
-│   │       ├── DateRangePicker.tsx
-│   │       ├── EmptyState.tsx
-│   │       └── PageHeader.tsx
+│   └── api/                          # Route Handlers (webhook receivers, etc.)
+│       └── webhooks/
+│           ├── stripe/route.ts
+│           └── midtrans/route.ts
+│
+├── modules/                          # Feature modules (core business logic)
+│   ├── dashboard/
+│   │   ├── actions.ts                # Server Actions: getGlobalKPIs, etc.
+│   │   ├── queries.ts                # Supabase queries
+│   │   ├── types.ts                  # TypeScript types modul ini
+│   │   └── components/
+│   │       ├── KPICardGrid.tsx
+│   │       ├── RevenueAreaChart.tsx
+│   │       ├── MicroSaaSStatusGrid.tsx
+│   │       └── ActivityFeed.tsx
 │   │
-│   ├── lib/                              # Utilities & configs
-│   │   ├── supabase/
-│   │   │   ├── client.ts                 # Browser client
-│   │   │   ├── server.ts                 # Server client (Server Actions/RSC)
-│   │   │   └── middleware.ts             # Session refresh helper
-│   │   ├── auth/
-│   │   │   ├── permissions.ts            # Permission matrix (role → actions)
-│   │   │   └── audit.ts                  # recordAuditLog() helper
-│   │   ├── utils.ts                      # cn(), formatCurrency(), formatDate()
-│   │   └── constants.ts                  # App-wide constants
+│   ├── microsaas/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── MicroSaaSTable.tsx
+│   │       ├── MicroSaaSCard.tsx
+│   │       ├── MicroSaaSForm.tsx
+│   │       └── MicroSaaSConfigForm.tsx
 │   │
-│   ├── hooks/                            # Shared custom React hooks
-│   │   ├── useAuth.ts
-│   │   ├── useRealtime.ts
-│   │   └── useDebounce.ts
+│   ├── users/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── UserTable.tsx
+│   │       ├── UserDetailCard.tsx
+│   │       ├── UserActionsMenu.tsx
+│   │       └── BulkActionBar.tsx
 │   │
-│   └── types/                            # Global TypeScript types
-│       ├── database.ts                   # Auto-generated dari Supabase
-│       └── index.ts                      # Re-exports & global types
+│   ├── subscriptions/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── SubscriptionTable.tsx
+│   │       ├── SubscriptionOverrideModal.tsx
+│   │       └── ChurnRiskTable.tsx
+│   │
+│   ├── revenue/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── RevenueMetricCards.tsx
+│   │       ├── RevenueBreakdownTable.tsx
+│   │       ├── RevenueDonutChart.tsx
+│   │       └── TransactionTable.tsx
+│   │
+│   ├── payment/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── GatewayConfigForm.tsx
+│   │       ├── PlanForm.tsx
+│   │       ├── PlanPreviewCard.tsx
+│   │       ├── PromoCodeForm.tsx
+│   │       └── WebhookLogTable.tsx
+│   │
+│   ├── performance/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── UptimeTimeline.tsx
+│   │       ├── ResponseTimeChart.tsx
+│   │       └── ErrorRateChart.tsx
+│   │
+│   ├── alerts/
+│   │   ├── actions.ts
+│   │   ├── queries.ts
+│   │   ├── types.ts
+│   │   └── components/
+│   │       ├── AlertRuleForm.tsx
+│   │       ├── AlertRuleTable.tsx
+│   │       └── NotificationBell.tsx
+│   │
+│   └── admin/
+│       ├── actions.ts
+│       ├── queries.ts
+│       ├── types.ts
+│       └── components/
+│           ├── AdminTable.tsx
+│           ├── InviteAdminModal.tsx
+│           └── AuditLogTable.tsx
+│
+├── components/                       # Shared / UI components
+│   ├── ui/                           # shadcn/ui components (owned, customized)
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── dialog.tsx
+│   │   ├── table.tsx
+│   │   ├── badge.tsx
+│   │   ├── input.tsx
+│   │   ├── select.tsx
+│   │   ├── skeleton.tsx
+│   │   ├── sheet.tsx
+│   │   ├── sonner.tsx
+│   │   └── ...                       # semua shadcn components
+│   │
+│   ├── layout/                       # Shell & navigation
+│   │   ├── AppShell.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Header.tsx
+│   │   └── Breadcrumb.tsx
+│   │
+│   └── shared/                       # Reusable cross-module components
+│       ├── StatCard.tsx
+│       ├── ConfirmDialog.tsx
+│       ├── DataTable.tsx
+│       ├── DateRangePicker.tsx
+│       ├── EmptyState.tsx
+│       └── PageHeader.tsx
+│
+├── lib/                              # Utilities & configs
+│   ├── supabase/
+│   │   ├── client.ts                 # Browser client
+│   │   ├── server.ts                 # Server client (Server Actions/RSC)
+│   │   └── middleware.ts             # Session refresh helper
+│   ├── auth/
+│   │   ├── permissions.ts            # Permission matrix (role → actions)
+│   │   └── audit.ts                  # recordAuditLog() helper
+│   ├── utils.ts                      # cn(), formatCurrency(), formatDate()
+│   └── constants.ts                  # App-wide constants
+│
+├── hooks/                            # Shared custom React hooks
+│   ├── useAuth.ts
+│   ├── useRealtime.ts
+│   └── useDebounce.ts
+│
+├── types/                            # Global TypeScript types
+│   ├── database.ts                   # Auto-generated dari Supabase
+│   └── index.ts                      # Re-exports & global types
 │
 ├── supabase/
 │   ├── migrations/                       # SQL migration files
@@ -602,15 +603,14 @@ dashboard-saas/
 ├── public/                               # Static assets
 ├── .env.local.example
 ├── components.json                       # shadcn/ui config
-├── tailwind.config.ts
 ├── next.config.ts
 └── tsconfig.json
 ```
 
 > **Prinsip Modular Structure:**
-> - **Modules** (`src/modules/`) → semua logic bisnis per fitur: actions, queries, types, dan komponen spesifik modul
-> - **Components** (`src/components/`) → hanya komponen yang **digunakan oleh lebih dari satu modul**
-> - **Lib** (`src/lib/`) → pure utilities, konfigurasi client, dan helpers tanpa UI
+> - **Modules** (`modules/`) → semua logic bisnis per fitur: actions, queries, types, dan komponen spesifik modul
+> - **Components** (`components/`) → hanya komponen yang **digunakan oleh lebih dari satu modul**
+> - **Lib** (`lib/`) → pure utilities, konfigurasi client, dan helpers tanpa UI
 > - Import antar modul **dilarang** (modul A tidak import dari modul B). Shared logic naik ke `lib/` atau `components/shared/`
 
 ---
