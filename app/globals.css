@@ -236,7 +236,7 @@
 @utility glass-floating {
   background: rgb(38 42 52);
   border: 1px solid rgb(0 242 254 / 20%);
-  backdrop-filter: blur(10px);
+  /* backdrop-filter: blur(10px); */
 }
 
 /* @supports (backdrop-filter: blur(10px)) {
