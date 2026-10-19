@@ -123,7 +123,9 @@ function RecentActivity({ initialResult }: ActivityFeedProps) {
     const timer = setInterval(() => {
       if (!connected) void load();
     }, 60000);
-    const onFocus = () => void load();
+    const onFocus = () => {
+      if (!connected) void load();
+    };
     const onOffline = () => {
       connected = false;
       setConnection("Offline · menunggu koneksi");
