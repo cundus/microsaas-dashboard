@@ -224,21 +224,23 @@
 }
 
 @utility glass-panel {
-  background:
+  /* background:
     linear-gradient(rgb(28 31 41 / 65%), rgb(28 31 41 / 65%)) padding-box,
     linear-gradient(180deg, rgb(255 255 255 / 15%), rgb(255 255 255 / 2%))
-      border-box;
+      border-box; */
+  background: rgb(38 42 52);
+
   border: 1px solid transparent;
 }
 
 @utility glass-floating {
-  background: rgb(38 42 52 / 95%);
+  background: rgb(38 42 52);
   border: 1px solid rgb(0 242 254 / 20%);
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(10px);
 }
 
-@supports (backdrop-filter: blur(24px)) {
+/* @supports (backdrop-filter: blur(10px)) {
   .glass-floating {
     background: rgb(38 42 52 / 80%);
   }
-}
+} */
