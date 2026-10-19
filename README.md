@@ -491,6 +491,33 @@ empty state, pencarian/filter/sorting URL, Back, page size, dan URL dengan tangg
 Data berisi diuji di database embedded; tidak menambahkan seed bisnis ke cloud.
 Halaman detail pengguna dan aksi akun mengikuti STORY-015/016.
 
+## STORY-015 — User Detail Page
+
+Klik nama pengguna di `/users` untuk membuka `/users/[userId]`. Halaman memuat
+profil, produk, tanggal bergabung/login terakhir (WIB), subscription berjalan,
+riwayat transaksi, serta aktivitas login. Subscription active/trial/past_due/
+complimentary termasuk; canceled/expired dikecualikan. Setiap tabel mempunyai
+pagination server 25/50/100 melalui `subscriptionsPage`, `transactionsPage`,
+`loginsPage`, dan `size` di URL. Mata uang ditampilkan per transaksi/subscription.
+Finance ditolak; Operator mengikuti assignment, termasuk query count/riwayat.
+User tidak ditemukan, tidak terakses, atau soft-deleted menghasilkan not-found.
+
+Migration `20261019000800_user_login_history.sql` sudah diterapkan ke cloud.
+Riwayat login berasal dari insert/perubahan `users.last_login_at` oleh integrasi
+MicroSaaS, bukan login admin dashboard. Kirim timestamp login produk yang sebenarnya
+setiap login berhasil; timestamp identik tidak menghasilkan event ganda.
+Backfill hanya menyimpan login terakhir yang tersedia, sehingga riwayat sebelumnya,
+IP, perangkat, dan login gagal tidak tersedia. Browser tidak dapat menulis tabel
+riwayat secara langsung. Tipe Supabase sudah diperbarui.
+
+Jalankan `pnpm test:user-detail` untuk validasi, scope action, pagination/error,
+fallback avatar sebelum hydration, trigger/backfill login, dan RLS. Pengujian
+browser memakai session admin cloud untuk not-found/URL invalid dan fixture lokal
+sementara untuk tampilan berisi/kosong, IDR/USD, tautan pagination, serta avatar.
+Fixture lokal sudah dihapus; tidak menambahkan data bisnis ke cloud. Pemeriksaan
+aksesibilitas fixture menemukan 0 pelanggaran. Data pengguna cloud nyata dan review
+visual pengguna masih perlu diverifikasi. Aksi akun mengikuti STORY-016.
+
 Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
 [Husky](https://typicode.github.io/husky/get-started.html), dan
 [Prettier](https://prettier.io/docs/install).

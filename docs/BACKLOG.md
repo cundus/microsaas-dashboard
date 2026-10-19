@@ -2,7 +2,7 @@
 ## Multi-MicroSaaS Admin Dashboard
 
 **Versi:** 1.1.1
-**Terakhir Diupdate:** 2026-10-18  
+**Terakhir Diupdate:** 2026-10-19
 **Referensi:** [PRD.md](./PRD.md)
 
 ---
@@ -688,14 +688,45 @@ Halaman detail user dan aksi akun tetap STORY-015/016.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-083 | Buat halaman `/users/[userId]` | 1 | ☐ |
-| T-084 | Buat Server Action `getUserById(userId)` | 2 | ☐ |
-| T-085 | Buat section: Profil User (avatar, nama, email, join date, MicroSaaS) | 2 | ☐ |
-| T-086 | Buat section: Subscription aktif saat ini | 2 | ☐ |
-| T-087 | Buat section: Riwayat transaksi user | 2 | ☐ |
-| T-088 | Buat section: Log aktivitas / login history | 2 | ☐ |
+| T-083 | Buat halaman `/users/[userId]` | 1 | ✅ |
+| T-084 | Buat Server Action `getUserById(userId)` | 2 | ✅ |
+| T-085 | Buat section: Profil User (avatar, nama, email, join date, MicroSaaS) | 2 | ✅ |
+| T-086 | Buat section: Subscription aktif saat ini | 2 | ✅ |
+| T-087 | Buat section: Riwayat transaksi user | 2 | ✅ |
+| T-088 | Buat section: Log aktivitas / login history | 2 | ✅ |
 
 **Total SP: 11**
+
+**Implementasi (2026-10-19):** T-083–T-088 tersedia. Nama di daftar pengguna
+membuka `/users/[userId]`. Profil menampilkan avatar dengan fallback inisial,
+identitas, produk, tanggal bergabung, dan login terakhir dalam WIB. Subscription
+berjalan mengikuti active/trial/past_due/complimentary; canceled/expired dikecualikan.
+Subscription, transaksi, dan login memiliki pagination server 25/50/100 terpisah
+melalui URL; halaman di luar jangkauan dikembalikan ke halaman terakhir tersedia.
+Finance ditolak, Operator mengikuti assignment/RLS; user hilang, tidak terakses,
+atau soft-deleted menampilkan not-found. Loading, validasi URL, serta error/retry
+tersedia. Detail invoice/gateway dan aksi akun tetap di luar story ini.
+
+Migration `20261019000800` diterapkan ke cloud dan tipe resmi diperbarui.
+`user_login_history` merekam timestamp dari insert/perubahan `users.last_login_at`
+tanpa duplikasi; backfill hanya mengambil login terakhir yang sudah tersedia.
+Integrasi produk wajib memperbarui timestamp itu setiap login. Riwayat sebelum
+pencatatan, IP, perangkat, dan login gagal tidak direkonstruksi. Tabel hanya dapat
+dibaca admin operasional sesuai scope; klien tidak dapat menulis langsung.
+
+Verifikasi: `pnpm test:user-detail` menguji validasi, otorisasi action, scope query,
+pagination, kegagalan fetch, fallback avatar sebelum hydration, backfill/trigger,
+deduplikasi, serta RLS role/produk. Browser session admin cloud memverifikasi
+not-found dan URL invalid; tampilan profil, dua mata uang, subscription, transaksi,
+login, empty state, tautan pagination, dan fallback avatar diuji memakai route
+fixture lokal sementara yang sudah dihapus. Tidak menulis fixture bisnis ke cloud.
+Pemeriksaan aksesibilitas halaman fixture: 0 pelanggaran. Verifikasi data pengguna
+cloud nyata dan review visual pengguna masih terbuka.
+
+Seluruh 86 tes regresi, typecheck, lint file story, format check kode, dan build
+produksi lulus. Next.js MCP tidak melaporkan compilation/runtime error. Dry-run
+migrasi cloud menyatakan database up to date. Implementasi selesai; menunggu
+review visual pengguna.
 
 ---
 

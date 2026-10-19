@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getUsers } from "../actions";
+import { Avatar } from "./Avatar";
 import {
   parseUserQuery,
   userQueryParams,
@@ -150,7 +150,12 @@ export function UserTable({
             sortable: true,
             cell: (row) => (
               <div className="min-w-32">
-                <span className="font-medium">{row.name}</span>
+                <Link
+                  href={`/users/${row.id}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {row.name}
+                </Link>
                 <p className="mt-1 font-mono text-xs text-muted-foreground">
                   {row.id}
                 </p>
@@ -297,34 +302,5 @@ export function UserTable({
         }
       />
     </div>
-  );
-}
-
-function Avatar({ name, url }: { name: string; url: string | null }) {
-  const [failed, setFailed] = useState(false);
-  if (!failed && url && /^https?:\/\//i.test(url))
-    return (
-      <img
-        src={url}
-        alt={`Avatar ${name}`}
-        width={36}
-        height={36}
-        className="h-9 w-9 rounded-full object-cover"
-        onError={() => setFailed(true)}
-      />
-    );
-  return (
-    <span
-      aria-label={`Avatar ${name}`}
-      className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary"
-    >
-      {name
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase() || "?"}
-    </span>
   );
 }

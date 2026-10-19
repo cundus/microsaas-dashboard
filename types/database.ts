@@ -1470,6 +1470,35 @@ export type Database = {
           },
         ];
       };
+      user_login_history: {
+        Row: {
+          id: number;
+          microsaas_id: string;
+          occurred_at: string;
+          user_id: string;
+        };
+        Insert: {
+          id?: never;
+          microsaas_id: string;
+          occurred_at: string;
+          user_id: string;
+        };
+        Update: {
+          id?: never;
+          microsaas_id?: string;
+          occurred_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_login_history_user_id_microsaas_id_fkey";
+            columns: ["user_id", "microsaas_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id", "microsaas_id"];
+          },
+        ];
+      };
       users: {
         Row: {
           avatar_url: string | null;
