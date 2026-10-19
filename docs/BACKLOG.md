@@ -649,14 +649,29 @@ visual pengguna. Detail konfigurasi dan batas integrasi ada di README.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-077 | Buat halaman `/users` | 1 | ☐ |
-| T-078 | Buat Server Action `getUsers(filters, pagination)` dengan query Supabase | 3 | ☐ |
-| T-079 | Implementasi search dengan debounce (300ms) | 2 | ☐ |
-| T-080 | Implementasi multi-filter (MicroSaaS, Plan, Status) via URL params | 2 | ☐ |
-| T-081 | Buat komponen `UserTable` dengan kolom dan sorting | 3 | ☐ |
-| T-082 | Implementasi pagination dengan URL params | 2 | ☐ |
+| T-077 | Buat halaman `/users` | 1 | ✅ |
+| T-078 | Buat Server Action `getUsers(filters, pagination)` dengan query Supabase | 3 | ✅ |
+| T-079 | Implementasi search dengan debounce (300ms) | 2 | ✅ |
+| T-080 | Implementasi multi-filter (MicroSaaS, Plan, Status) via URL params | 2 | ✅ |
+| T-081 | Buat komponen `UserTable` dengan kolom dan sorting | 3 | ✅ |
+| T-082 | Implementasi pagination dengan URL params | 2 | ✅ |
 
 **Total SP: 13**
+
+**Implementasi (2026-10-19):** T-077–T-082 tersedia. `/users` memakai DataTable
+shared, kolom avatar/nama/email/produk/plan/status/join date, search literal
+nama/email/UUID dengan debounce 300 ms, filter gabungan via URL, sorting, dan
+pagination server 25/50/100. Tanggal inklusif mengikuti WIB. RPC security invoker
+mempertahankan RLS pada rows/count/joins; Finance dan akun tidak sah ditolak.
+Plan mengikuti subscription berjalan terbaru tanpa duplikasi user. Empty/loading,
+error/retry, reset, reload URL, dan Back/Forward ditangani. Request stale diabaikan.
+
+Migration cloud 20261019000700 diterapkan dan tipe resmi diperbarui. Seluruh
+82 tes, typecheck, lint file story, dan build produksi lulus. Browser session
+admin cloud memverifikasi empty state, search/status/sort URL, Back, page size,
+serta URL filter tanggal. Data berisi/pagination/role diuji di database embedded,
+tanpa seed bisnis cloud. Implementasi selesai; menunggu review visual pengguna.
+Halaman detail user dan aksi akun tetap STORY-015/016.
 
 ---
 

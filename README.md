@@ -462,6 +462,35 @@ dan delete dengan konfirmasi. Produk uji dan logo dibersihkan setelah pengujian;
 audit tetap dipertahankan. Tab tabel diuji dengan empty state cloud; data berisi
 dan isolasi role diuji di database embedded. Review visual pengguna masih terbuka.
 
+## STORY-014 — User List & Search
+
+`/users` tersedia untuk Super Admin dan Operator. Tabel memakai shared DataTable
+dengan avatar/inisial, nama, email, produk, plan berjalan terbaru, status, dan
+tanggal bergabung. Pencarian literal nama/email/ID tidak menafsirkan wildcard SQL;
+fetch didebounce 300 ms, request lama diabaikan, dan kegagalan bisa dicoba ulang.
+
+Filter produk, plan, status, tanggal bergabung, sorting, page, serta page size
+disimpan di URL. Native history menyinkronkan Back/Forward dan kontrol tabel;
+server action membaca halaman baru setelah perubahan filter. Reload URL memakai
+query yang sama di server. Rentang tanggal inklusif menggunakan Asia/Jakarta.
+Ukuran halaman 25/50/100, urutan memiliki ID tie-break, dan page di luar hasil
+dikembalikan ke halaman terakhir yang tersedia. Pengguna soft-deleted dikecualikan.
+
+Plan ditentukan dari subscription active/trial/past_due/complimentary terbaru
+berdasarkan created_at lalu ID; canceled/expired tidak dianggap sebagai plan
+berjalan. Filter plan mengikuti plan yang tampil, tanpa menggandakan pengguna
+yang memiliki beberapa subscription. RPC `get_users` memakai security invoker,
+sehingga RLS berlaku pada baris, count, serta join plan/produk. Finance, non-admin,
+dan akun admin nonaktif ditolak. Tidak memakai service role atau dependency baru.
+
+Migration `20261019000700` sudah diterapkan ke project cloud dan tipe diperbarui.
+`pnpm test:users` menguji query/validasi, tanggal WIB, pagination, sorting, beberapa
+subscription, isolasi role, debounce, dan respons stale. Seluruh 82 tes, typecheck,
+lint file story, serta build produksi lulus. Browser admin cloud memverifikasi
+empty state, pencarian/filter/sorting URL, Back, page size, dan URL dengan tanggal.
+Data berisi diuji di database embedded; tidak menambahkan seed bisnis ke cloud.
+Halaman detail pengguna dan aksi akun mengikuti STORY-015/016.
+
 Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
 [Husky](https://typicode.github.io/husky/get-started.html), dan
 [Prettier](https://prettier.io/docs/install).

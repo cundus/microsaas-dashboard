@@ -1603,6 +1603,25 @@ export type Database = {
           period_start: string;
         }[];
       };
+      get_users: {
+        Args: {
+          p_direction?: string;
+          p_joined_from?: string;
+          p_joined_to?: string;
+          p_microsaas?: string;
+          p_page?: number;
+          p_plan?: string;
+          p_search?: string;
+          p_size?: number;
+          p_sort?: string;
+          p_status?: string;
+        };
+        Returns: {
+          current_page: number;
+          rows: Json;
+          total: number;
+        }[];
+      };
       is_project_member: { Args: { p_project: string }; Returns: boolean };
       is_project_member_for_user: {
         Args: { p_project_id: string; p_user_id: string };
