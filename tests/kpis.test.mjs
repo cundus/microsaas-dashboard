@@ -122,7 +122,9 @@ test("KPI aggregation, historical changes, currencies and authorization", async 
         "insert into public.microsaas (name, slug, url, created_at) values ('Historical', 'historical', 'https://example.com', now() - interval '60 days')",
       );
       await asAdmin(1);
-      await db.exec("delete from public.microsaas where slug = 'historical'");
+      await db.exec(
+        "select public.delete_microsaas(id, name) from public.microsaas where slug = 'historical'",
+      );
       assert.equal(Number(row(await kpis(), "microsaas").previous), 4);
     },
   );

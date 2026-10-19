@@ -219,7 +219,9 @@ test("daily MRR, historical reconstruction and RPC authorization", async (t) => 
       insert into public.microsaas (name, slug, url, created_at) values ('Deleted', 'deleted', 'https://example.com', now() - interval '400 days');
     `);
       await asAdmin(1);
-      await db.exec("delete from public.microsaas where slug = 'deleted'");
+      await db.exec(
+        "select public.delete_microsaas(id, name) from public.microsaas where slug = 'deleted'",
+      );
       const rows = await query();
       const dates = [...new Set(rows.map((r) => String(r.day)))];
       assert.equal(total(rows, dates.at(-4), "JPY"), 1000);

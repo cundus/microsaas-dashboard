@@ -416,6 +416,52 @@ Build dapat dijalankan tanpa menyentuh output dev yang sedang aktif:
 sama ketika menjalankan `pnpm start`, lalu hapus environment tersebut sebelum
 menjalankan `pnpm dev` bila ingin kembali ke output default `.next`.
 
+## Epic 3 — MicroSaaS Management
+
+`/microsaas` menampilkan registry sesuai RLS. Super Admin dapat membuat dan
+mengedit produk, mengunggah logo PNG/JPEG/WebP maksimal 1 MB, serta menghapus
+produk setelah mengetik nama persis. Slug otomatis mengikuti nama sampai diedit
+manual; constraint database menjamin uniqueness. Produk dengan data bisnis terkait
+tidak dapat dihapus; gunakan status nonaktif agar riwayat tetap tersimpan.
+
+Detail `/microsaas/[slug]` memiliki Overview, Users, Subscriptions, Revenue, dan
+Performance. Tab memuat data produk dari database, dengan pagination server
+25/50/100 untuk tabel. Revenue memisahkan mata uang pada MRR/ARR; Performance
+memakai uptime 30 hari endpoint `/` dan daftar sampel. Operator hanya mengakses
+produk assignment; Finance tidak mendapat tab Users/Performance atau konfigurasi.
+Tabel detail bersifat baca; aksi support, override billing, dan monitoring lanjutan
+tetap mengikuti epic masing-masing.
+
+Overview Super Admin menyediakan webhook HTTPS, environment, rotasi API key,
+dan maintenance dengan konfirmasi nama. API key kosong mempertahankan key lama.
+Key dienkripsi AES-256-GCM dengan identitas produk sebagai authenticated data;
+ciphertext disimpan di schema `private`, sedangkan metadata dan audit hanya
+menyimpan mask tetap. Atur `MICROSAAS_ENCRYPTION_KEY` di environment server:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
+```
+
+Simpan key ini di secret manager dan backup; gunakan nilai yang sama pada semua
+instance. Key lokal sudah dibuat saat implementasi, tanpa dicatat di Git.
+Mengganti key enkripsi memerlukan migrasi ciphertext. Maintenance menyimpan flag;
+aplikasi MicroSaaS perlu mengonsumsi flag itu untuk membatasi layanan produk.
+
+Migration `20261019000500` dan `20261019000600` sudah diterapkan pada project
+cloud yang terhubung; bucket publik `microsaas-logos` hanya mengizinkan mutasi
+Super Admin. Logo lama dibersihkan setelah penggantian/penghapusan produk;
+kegagalan pembersihan Storage tidak membatalkan mutasi database yang sudah sukses.
+Audit database mencatat CRUD, konfigurasi, dan maintenance secara atomik.
+
+Verifikasi: `pnpm test:microsaas-management`, seluruh 73 tes regresi, typecheck,
+dan build produksi lulus. ESLint memakai `--ignore-pattern 'test-results/**'`
+untuk mengecualikan artefak eksperimen lama; tiga warning pada script Lighthouse
+yang sudah ada tetap terpisah dari Epic 3. Browser dengan session admin cloud
+memverifikasi create/edit, upload logo, API key masked, maintenance, lima tab,
+dan delete dengan konfirmasi. Produk uji dan logo dibersihkan setelah pengujian;
+audit tetap dipertahankan. Tab tabel diuji dengan empty state cloud; data berisi
+dan isolasi role diuji di database embedded. Review visual pengguna masih terbuka.
+
 Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
 [Husky](https://typicode.github.io/husky/get-started.html), dan
 [Prettier](https://prettier.io/docs/install).

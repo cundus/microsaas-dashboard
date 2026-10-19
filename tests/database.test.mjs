@@ -143,6 +143,10 @@ test("foundation migration, seed, constraints, and RLS", async (t) => {
         "microsaas",
       ]) {
         assert.ok(await count(table), table);
+        if (table === "microsaas") {
+          await denied("delete from public.microsaas");
+          continue;
+        }
         const result = await db.query(
           `delete from public.${table} returning *`,
         );

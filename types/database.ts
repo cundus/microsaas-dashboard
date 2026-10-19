@@ -788,6 +788,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      microsaas_config: {
+        Row: {
+          api_key_mask: string | null;
+          environment: string;
+          maintenance_mode: boolean;
+          microsaas_id: string;
+          updated_at: string;
+          webhook_url: string | null;
+        };
+        Insert: {
+          api_key_mask?: string | null;
+          environment?: string;
+          maintenance_mode?: boolean;
+          microsaas_id: string;
+          updated_at?: string;
+          webhook_url?: string | null;
+        };
+        Update: {
+          api_key_mask?: string | null;
+          environment?: string;
+          maintenance_mode?: boolean;
+          microsaas_id?: string;
+          updated_at?: string;
+          webhook_url?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "microsaas_config_microsaas_id_fkey";
+            columns: ["microsaas_id"];
+            isOneToOne: true;
+            referencedRelation: "microsaas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       payment_gateways: {
         Row: {
           created_at: string;
@@ -1507,6 +1542,10 @@ export type Database = {
     };
     Functions: {
       claim_pending_invites: { Args: never; Returns: number };
+      delete_microsaas: {
+        Args: { p_confirmation: string; p_id: string };
+        Returns: undefined;
+      };
       get_global_kpis: {
         Args: never;
         Returns: {
@@ -1570,6 +1609,20 @@ export type Database = {
         Returns: boolean;
       };
       is_project_owner: { Args: { p_project: string }; Returns: boolean };
+      save_microsaas_config: {
+        Args: {
+          p_ciphertext?: string;
+          p_environment: string;
+          p_id: string;
+          p_mask?: string;
+          p_webhook: string;
+        };
+        Returns: undefined;
+      };
+      set_microsaas_maintenance: {
+        Args: { p_confirmation: string; p_enabled: boolean; p_id: string };
+        Returns: undefined;
+      };
       shares_project_with: { Args: { p_user: string }; Returns: boolean };
     };
     Enums: {

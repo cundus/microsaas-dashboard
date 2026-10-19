@@ -556,14 +556,14 @@ bisnis; fixture tidak ditulis ke cloud.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-063 | Buat halaman `/microsaas` dengan daftar dan tombol tambah | 2 | ☐ |
-| T-064 | Buat Server Action: `createMicroSaaS()` | 2 | ☐ |
-| T-065 | Buat Server Action: `updateMicroSaaS()` | 2 | ☐ |
-| T-066 | Buat Server Action: `deleteMicroSaaS()` | 2 | ☐ |
-| T-067 | Buat komponen `MicroSaaSForm` (modal/drawer) | 3 | ☐ |
-| T-068 | Implementasi konfirmasi delete dengan input nama produk | 2 | ☐ |
-| T-069 | Implementasi logo upload via Supabase Storage | 3 | ☐ |
-| T-070 | Auto-generate slug dari nama dengan validasi uniqueness | 1 | ☐ |
+| T-063 | Buat halaman `/microsaas` dengan daftar dan tombol tambah | 2 | ✅ |
+| T-064 | Buat Server Action: `createMicroSaaS()` | 2 | ✅ |
+| T-065 | Buat Server Action: `updateMicroSaaS()` | 2 | ✅ |
+| T-066 | Buat Server Action: `deleteMicroSaaS()` | 2 | ✅ |
+| T-067 | Buat komponen `MicroSaaSForm` (modal/drawer) | 3 | ✅ |
+| T-068 | Implementasi konfirmasi delete dengan input nama produk | 2 | ✅ |
+| T-069 | Implementasi logo upload via Supabase Storage | 3 | ✅ |
+| T-070 | Auto-generate slug dari nama dengan validasi uniqueness | 1 | ✅ |
 
 **Total SP: 17**
 
@@ -582,9 +582,9 @@ bisnis; fixture tidak ditulis ke cloud.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-071 | Buat layout halaman `/microsaas/[slug]` dengan tab navigation | 2 | ☐ |
-| T-072 | Buat tab Overview: KPI mini (P0) + recent activity (P1, mengikuti FR-05) | 2 | ☐ |
-| T-073 | Integrasi tab Users, Subscriptions, Revenue, Performance dari epic terkait; stub tidak memenuhi acceptance MVP | 1 | ☐ |
+| T-071 | Buat layout halaman `/microsaas/[slug]` dengan tab navigation | 2 | ✅ |
+| T-072 | Buat tab Overview: KPI mini (P0) + recent activity (P1, mengikuti FR-05) | 2 | ✅ |
+| T-073 | Integrasi tab Users, Subscriptions, Revenue, Performance dari epic terkait; stub tidak memenuhi acceptance MVP | 1 | ✅ |
 
 **Total SP: 5**
 
@@ -598,11 +598,33 @@ bisnis; fixture tidak ditulis ke cloud.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-074 | Form konfigurasi: webhook URL, API key display (masked), environment | 3 | ☐ |
-| T-075 | Toggle maintenance mode dengan konfirmasi | 2 | ☐ |
-| T-076 | Simpan konfigurasi secara aman (enkripsi secrets di DB) | 3 | ☐ |
+| T-074 | Form konfigurasi: webhook URL, API key display (masked), environment | 3 | ✅ |
+| T-075 | Toggle maintenance mode dengan konfirmasi | 2 | ✅ |
+| T-076 | Simpan konfigurasi secara aman (enkripsi secrets di DB) | 3 | ✅ |
 
 **Total SP: 8**
+
+---
+
+**Bukti implementasi Epic 3 (2026-10-19):** T-063–T-076 tersedia. Registry dan
+form modal CRUD memakai validasi server, slug otomatis/unique, logo Supabase Storage,
+RLS Super Admin, audit atomik, dan konfirmasi ketik nama untuk hapus/maintenance.
+Produk dengan riwayat bisnis tidak dihapus; nonaktifkan agar histori aman.
+Lima tab memuat query scoped nyata: KPI/recent activity, users, subscriptions,
+transaksi/MRR/ARR per mata uang, serta uptime 30 hari. Tabel memakai pagination
+server 25/50/100; aksi lanjutan mengikuti epic modul masing-masing.
+Konfigurasi owner-only mencakup webhook HTTPS, environment, API key masked dengan
+AES-256-GCM di schema private, dan maintenance flag. Aplikasi produk perlu membaca
+flag maintenance untuk menerapkannya pada layanan.
+
+Migration cloud 20261019000500/20261019000600 diterapkan dan tipe resmi diperbarui.
+Seluruh 73 tes regresi, typecheck, build, dan runtime Next.js lulus. Lint kode
+mengecualikan artefak lama test-results; tiga warning script Lighthouse yang sudah
+ada tetap tercatat. Browser admin cloud memverifikasi create/edit, logo upload,
+API key masked, maintenance, kelima tab empty state, dan delete. Data bisnis berisi
+serta isolasi role diverifikasi melalui database embedded. Produk/Storage fixture
+browser dibersihkan; audit tetap disimpan. Implementasi selesai; menunggu review
+visual pengguna. Detail konfigurasi dan batas integrasi ada di README.
 
 ---
 
