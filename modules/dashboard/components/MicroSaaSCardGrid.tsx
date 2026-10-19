@@ -9,10 +9,16 @@ import { getMicroSaaSList } from "../actions";
 import type { MicroSaaSSummary } from "../microsaas";
 import { MicroSaaSCard } from "./MicroSaaSCard";
 
-export function MicroSaaSCardGrid() {
+export function MicroSaaSCardGrid({
+  initialResult,
+}: {
+  initialResult: Awaited<ReturnType<typeof getMicroSaaSList>>;
+}) {
   const admin = useAuth();
-  const [data, setData] = useState<MicroSaaSSummary[]>();
-  const [error, setError] = useState<string>();
+  const [data, setData] = useState<MicroSaaSSummary[] | undefined>(
+    initialResult.data,
+  );
+  const [error, setError] = useState<string | undefined>(initialResult.error);
   const [pending, startTransition] = useTransition();
 
   function refresh() {
@@ -45,7 +51,6 @@ export function MicroSaaSCardGrid() {
         if (mounted) setError("Koneksi terputus. Silakan coba lagi.");
       }
     }
-    void load();
     const timer = setInterval(() => void load(), 5 * 60 * 1000);
     return () => {
       mounted = false;

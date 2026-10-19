@@ -25,6 +25,13 @@ test("percentage delta handles growth, decline, rounding and zero baselines", ()
   assert.equal(formatKPI(1200, null), "1.200");
 });
 
+test("currency precision is explicit so Node and browser ICU defaults cannot change markup", () => {
+  assert.equal(formatKPI(0, "IDR"), "Rp\u00a00,00");
+  assert.equal(formatKPI(1200.5, "IDR"), "Rp\u00a01.200,50");
+  assert.equal(formatKPI(1, "USD"), "US$1,00");
+  assert.equal(formatKPI(1200, null), "1.200");
+});
+
 test("KPI aggregation, historical changes, currencies and authorization", async (t) => {
   const db = await createDatabase();
   t.after(() => db.close());

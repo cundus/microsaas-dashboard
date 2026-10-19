@@ -41,15 +41,24 @@ const timestamp = (value: string) =>
     timeZone: "Asia/Jakarta",
   }).format(new Date(value));
 
-export function ActivityFeed() {
+type ActivityFeedProps = {
+  initialResult: Awaited<ReturnType<typeof getRecentActivity>>;
+};
+
+export function ActivityFeed({ initialResult }: ActivityFeedProps) {
   const admin = useAuth();
-  return admin ? <RecentActivity key={`${admin.id}:${admin.role}`} /> : null;
+  return admin ? (
+    <RecentActivity
+      key={`${admin.id}:${admin.role}`}
+      initialResult={initialResult}
+    />
+  ) : null;
 }
 
-function RecentActivity() {
-  const [data, setData] = useState<Activity[]>();
-  const [error, setError] = useState<string>();
-  const [pending, setPending] = useState(true);
+function RecentActivity({ initialResult }: ActivityFeedProps) {
+  const [data, setData] = useState<Activity[] | undefined>(initialResult.data);
+  const [error, setError] = useState<string | undefined>(initialResult.error);
+  const [pending, setPending] = useState(false);
   const [connection, setConnection] = useState("Menghubungkan…");
   const refresh = useRef<() => void>(() => {});
 
@@ -89,7 +98,6 @@ function RecentActivity() {
       }
     }
     refresh.current = () => void load();
-    void load();
     const supabase = createClient();
     const channel = supabase
       .channel("dashboard-activity")

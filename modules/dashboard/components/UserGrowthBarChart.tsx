@@ -1,15 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { ChartViewport, ChartPlaceholder } from "./ChartViewport";
+
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +22,11 @@ import type {
   UserGrowthRange,
 } from "../user-growth";
 
+const UserGrowthPlot = dynamic(
+  () => import("./UserGrowthPlot").then((module) => module.UserGrowthPlot),
+  { loading: ChartPlaceholder },
+);
+
 const dateLabel = (day: string) =>
   new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
@@ -38,25 +37,36 @@ const dateLabel = (day: string) =>
 const numberLabel = (value: number) =>
   new Intl.NumberFormat("id-ID").format(value);
 
-export function UserGrowthBarChart() {
+type UserGrowthProps = {
+  initialResult: Awaited<ReturnType<typeof getUserGrowthTimeSeries>>;
+  initialRange: UserGrowthRange;
+};
+
+export function UserGrowthBarChart(props: UserGrowthProps) {
   const admin = useAuth();
-  return admin && admin.role !== "finance_admin" ? <UserGrowthChart /> : null;
+  return admin && admin.role !== "finance_admin" ? (
+    <UserGrowthChart {...props} />
+  ) : null;
 }
 
-function UserGrowthChart() {
+function UserGrowthChart({ initialResult, initialRange }: UserGrowthProps) {
   const [period, setPeriod] = useState("30");
-  const [range, setRange] = useState<UserGrowthRange>(() => ({
-    ...presetRange(30),
-    interval: "day",
-  }));
-  const [custom, setCustom] = useState(() => presetRange(30));
+  const [range, setRange] = useState<UserGrowthRange>(initialRange);
+  const [custom, setCustom] =
+    useState<Pick<UserGrowthRange, "start" | "end">>(initialRange);
   const [validation, setValidation] = useState<string>();
   const [revision, setRevision] = useState(0);
   const [result, setResult] = useState<{
     key: string;
     data?: UserGrowthPoint[];
     error?: string;
-  }>();
+  }>({
+    key: `${initialRange.start}/${initialRange.end}/${initialRange.interval}`,
+    ...initialResult,
+  });
+  const lastRequest = useRef(
+    `${initialRange.start}/${initialRange.end}/${initialRange.interval}/0`,
+  );
   const key = `${range.start}/${range.end}/${range.interval}`;
   const data = result?.key === key ? result.data : undefined;
   const error = result?.key === key ? result.error : undefined;
@@ -90,7 +100,11 @@ function UserGrowthChart() {
           }));
       }
     }
-    void load();
+    const request = `${key}/${revision}`;
+    if (lastRequest.current !== request) {
+      lastRequest.current = request;
+      void load();
+    }
     const timer = setInterval(() => void load(), 300000);
     return () => {
       active = false;
@@ -251,75 +265,13 @@ function UserGrowthChart() {
               menghitung tanggal yang dipilih. Arahkan kursor atau gunakan
               tombol panah pada grafik untuk melihat nilai.
             </p>
-            <div
-              className="h-80 w-full min-w-0"
-              aria-label="Grafik jumlah pengguna baru"
-            >
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <BarChart
-                  data={data}
-                  accessibilityLayer
-                  margin={{ top: 12, right: 12, left: 4, bottom: 4 }}
-                >
-                  <CartesianGrid
-                    stroke="rgba(255,255,255,0.04)"
-                    strokeDasharray="3 3"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="period_start"
-                    tickFormatter={dateLabel}
-                    stroke="#B9CACB"
-                    tickLine={false}
-                    axisLine={false}
-                    minTickGap={36}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    domain={[0, "auto"]}
-                    stroke="#B9CACB"
-                    tickLine={false}
-                    axisLine={false}
-                    width={56}
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={numberLabel}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "#67F4B7", fillOpacity: 0.08 }}
-                    labelFormatter={(_, payload) => {
-                      const row = payload[0]?.payload as
-                        UserGrowthPoint | undefined;
-                      return row
-                        ? row.period_start === row.period_end
-                          ? dateLabel(row.period_start)
-                          : `${dateLabel(row.period_start)} – ${dateLabel(row.period_end)}`
-                        : "";
-                    }}
-                    formatter={(value) => [
-                      numberLabel(Number(value)),
-                      "Pengguna baru",
-                    ]}
-                    contentStyle={{
-                      background: "rgba(15,19,28,0.9)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 12,
-                      backdropFilter: "blur(24px)",
-                      color: "#DFE2EF",
-                    }}
-                    labelStyle={{ color: "#DFE2EF" }}
-                  />
-                  <Bar
-                    dataKey="new_users"
-                    name="Pengguna baru"
-                    fill="#67F4B7"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={48}
-                    isAnimationActive={false}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartViewport label="Grafik jumlah pengguna baru">
+              <UserGrowthPlot
+                data={data}
+                dateLabel={dateLabel}
+                numberLabel={numberLabel}
+              />
+            </ChartViewport>
           </>
         )}
       </CardContent>

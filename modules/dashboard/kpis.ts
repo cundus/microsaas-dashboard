@@ -13,6 +13,7 @@ export function percentageChange(value: number, previous: number) {
 export function formatKPI(value: number, currency: string | null) {
   return new Intl.NumberFormat("id-ID", {
     ...(currency ? { style: "currency", currency } : {}),
+    minimumFractionDigits: currency ? 2 : 0,
     maximumFractionDigits: currency ? 2 : 0,
   }).format(value);
 }

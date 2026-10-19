@@ -50,7 +50,7 @@ export function Header({
       .join("")
       .toUpperCase() || "A";
   return (
-    <header className="sticky top-0 z-20 flex min-h-20 items-center justify-between gap-4 border-b border-white/8 bg-background/90 px-8 py-3 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 flex min-h-20 items-center justify-between gap-4 border-b border-white/8 bg-background px-8 py-3">
       <div className="flex min-w-0 items-center gap-4">
         <Button
           variant="ghost"

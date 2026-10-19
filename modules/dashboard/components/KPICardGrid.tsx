@@ -14,9 +14,13 @@ const metrics = [
   ["microsaas", "MicroSaaS Count"],
 ] as const;
 
-export function KPICardGrid() {
-  const [data, setData] = useState<KPI[]>();
-  const [error, setError] = useState<string>();
+export function KPICardGrid({
+  initialResult,
+}: {
+  initialResult: Awaited<ReturnType<typeof getGlobalKPIs>>;
+}) {
+  const [data, setData] = useState<KPI[] | undefined>(initialResult.data);
+  const [error, setError] = useState<string | undefined>(initialResult.error);
   const [pending, startTransition] = useTransition();
 
   function refresh() {
@@ -49,7 +53,6 @@ export function KPICardGrid() {
         if (mounted) setError("Koneksi terputus. Silakan coba lagi.");
       }
     }
-    void load();
     const timer = setInterval(() => void load(), 5 * 60 * 1000);
     return () => {
       mounted = false;
