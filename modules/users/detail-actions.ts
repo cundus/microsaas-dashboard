@@ -37,7 +37,7 @@ export async function getUserById(
     const { data: user, error } = await db
       .from("users")
       .select(
-        "id,name,email,avatar_url,status,external_id,created_at,last_login_at,microsaas_id,microsaas(name,slug)",
+        "id,name,email,avatar_url,status,ban_reason,external_id,created_at,last_login_at,microsaas_id,microsaas(name,slug)",
       )
       .eq("id", userId)
       .neq("status", "deleted")

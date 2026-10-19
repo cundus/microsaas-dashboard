@@ -97,13 +97,8 @@ test("foundation migration, seed, constraints, and RLS", async (t) => {
         ).rows.length,
         0,
       );
-      assert.equal(
-        (
-          await db.query(
-            `delete from public.users where microsaas_id = '${product(1)}' returning id`,
-          )
-        ).rows.length,
-        0,
+      await denied(
+        `delete from public.users where microsaas_id = '${product(1)}'`,
       );
       await denied(
         `update public.users set microsaas_id = '${product(2)}' where microsaas_id = '${product(1)}'`,

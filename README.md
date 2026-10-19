@@ -518,6 +518,42 @@ Fixture lokal sudah dihapus; tidak menambahkan data bisnis ke cloud. Pemeriksaan
 aksesibilitas fixture menemukan 0 pelanggaran. Data pengguna cloud nyata dan review
 visual pengguna masih perlu diverifikasi. Aksi akun mengikuti STORY-016.
 
+## STORY-016 — User Actions
+
+Detail `/users/[userId]` menyediakan Ban/Unban, Reset password, dan Hapus akun
+untuk Super Admin dan Operator sesuai assignment. Ban wajib alasan maksimal
+500 karakter; Unban mengembalikan status sebelumnya, termasuk trial. Ban lama
+tanpa snapshot kembali ke active. Alasan ban tampil di profil. Hapus akun wajib
+konfirmasi email yang cocok dan memakai soft delete; histori keuangan tetap
+disimpan. Setelah berhasil, pengguna kembali ke daftar. ConfirmDialog reusable
+dan Sonner menampilkan pending, sukses, serta error/retry.
+
+Migration `20261019000900_user_actions.sql` diterapkan ke cloud; tipe database
+diperbarui. RPC `manage_user` memeriksa role/scope dari database, mengunci baris,
+dan menjalankan mutasi beserta audit before/after secara atomik. Hard delete
+users dicabut dari authenticated. Tidak memakai service role. Integrasi produk
+harus membaca status banned/deleted untuk menegakkan akses; perubahan status
+dashboard tidak otomatis mencabut sesi Auth produk.
+
+Reset memanggil [Supabase resetPasswordForEmail](https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail)
+dengan email dari baris yang diotorisasi dan redirect URL produk dari registry.
+Client Auth terpisah memakai implicit flow tanpa menyimpan sesi atau PKCE
+verifier di cookie admin. Akun produk harus menggunakan Supabase Auth project
+yang sama. Tambahkan URL produk ke Auth Redirect URLs; aplikasi produk harus
+menangani `PASSWORD_RECOVERY` dan formulir `updateUser({ password })` sesuai
+[panduan password recovery](https://supabase.com/docs/guides/auth/passwords).
+Project Auth terpisah membutuhkan integrasi reset produk tersendiri. Audit
+mencatat permintaan, dengan jeda 60 detik per user lintas admin. Respons sukses
+tidak menjamin email terkirim atau email terdaftar di Auth.
+
+Jalankan `pnpm test:user-actions`. Seluruh 88 tes regresi, typecheck, lint file
+story, dan build produksi lulus. Browser memverifikasi dialog, konfirmasi email,
+serta error/toast memakai fixture lokal sementara yang sudah dihapus. Tidak
+mengubah akun bisnis cloud atau mengirim email nyata selama pengujian.
+Pengiriman email/reset dicatat sebagai **pending E2E manual test** pada
+[checklist STORY-016](docs/BACKLOG.md#story-016--user-actions-ban-reset-password-delete).
+Review visual pengguna masih terbuka.
+
 Referensi: [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual),
 [Husky](https://typicode.github.io/husky/get-started.html), dan
 [Prettier](https://prettier.io/docs/install).

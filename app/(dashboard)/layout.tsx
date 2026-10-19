@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { requireAdmin } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { Toaster } from "@/components/ui/sonner";
 
 async function AdminBoundary({ children }: { children: React.ReactNode }) {
   await connection();
@@ -10,6 +11,7 @@ async function AdminBoundary({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider key={JSON.stringify(admin)} admin={admin}>
       <AppShell>{children}</AppShell>
+      <Toaster />
     </AuthProvider>
   );
 }

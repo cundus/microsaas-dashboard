@@ -4,6 +4,7 @@ import type { getUserById } from "../detail-actions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar } from "./Avatar";
+import { UserActionsMenu } from "./UserActionsMenu";
 
 type Detail = NonNullable<Awaited<ReturnType<typeof getUserById>>["data"]>;
 const date = (value: string | null) =>
@@ -100,6 +101,12 @@ export function UserDetail({ data }: { data: Detail }) {
               : "Trial"}
         </Badge>
       </div>
+      <UserActionsMenu user={user} />
+      {user.status === "banned" && user.ban_reason && (
+        <p className="rounded-lg border border-border bg-muted p-4 text-sm">
+          <span className="font-semibold">Alasan ban:</span> {user.ban_reason}
+        </p>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Profil pengguna</CardTitle>

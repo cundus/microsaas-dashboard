@@ -1502,6 +1502,7 @@ export type Database = {
       users: {
         Row: {
           avatar_url: string | null;
+          ban_reason: string | null;
           created_at: string;
           deleted_at: string | null;
           email: string;
@@ -1511,10 +1512,12 @@ export type Database = {
           microsaas_id: string;
           name: string;
           status: string;
+          status_before_ban: string | null;
           updated_at: string;
         };
         Insert: {
           avatar_url?: string | null;
+          ban_reason?: string | null;
           created_at?: string;
           deleted_at?: string | null;
           email: string;
@@ -1524,10 +1527,12 @@ export type Database = {
           microsaas_id: string;
           name: string;
           status?: string;
+          status_before_ban?: string | null;
           updated_at?: string;
         };
         Update: {
           avatar_url?: string | null;
+          ban_reason?: string | null;
           created_at?: string;
           deleted_at?: string | null;
           email?: string;
@@ -1537,6 +1542,7 @@ export type Database = {
           microsaas_id?: string;
           name?: string;
           status?: string;
+          status_before_ban?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -1657,6 +1663,15 @@ export type Database = {
         Returns: boolean;
       };
       is_project_owner: { Args: { p_project: string }; Returns: boolean };
+      manage_user: {
+        Args: {
+          p_action: string;
+          p_confirmation?: string;
+          p_reason?: string;
+          p_user_id: string;
+        };
+        Returns: Json;
+      };
       save_microsaas_config: {
         Args: {
           p_ciphertext?: string;

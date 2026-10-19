@@ -744,15 +744,54 @@ review visual pengguna.
 
 | # | Task | SP | Status |
 |---|---|---|---|
-| T-089 | Buat Server Action `banUser(userId, reason)` | 2 | ☐ |
-| T-090 | Buat Server Action `unbanUser(userId)` | 1 | ☐ |
-| T-091 | Buat Server Action `resetUserPassword(userId)` | 2 | ☐ |
-| T-092 | Buat Server Action `deleteUser(userId)` dengan soft delete | 2 | ☐ |
-| T-093 | Buat komponen `UserActionsMenu` (dropdown atau button group) | 2 | ☐ |
-| T-094 | Buat komponen `ConfirmDialog` yang reusable | 2 | ☐ |
-| T-095 | Setup toast notification sistem (Sonner) | 1 | ☐ |
+| T-089 | Buat Server Action `banUser(userId, reason)` | 2 | ✅ |
+| T-090 | Buat Server Action `unbanUser(userId)` | 1 | ✅ |
+| T-091 | Buat Server Action `resetUserPassword(userId)` | 2 | ✅ |
+| T-092 | Buat Server Action `deleteUser(userId)` dengan soft delete | 2 | ✅ |
+| T-093 | Buat komponen `UserActionsMenu` (dropdown atau button group) | 2 | ✅ |
+| T-094 | Buat komponen `ConfirmDialog` yang reusable | 2 | ✅ |
+| T-095 | Setup toast notification sistem (Sonner) | 1 | ✅ |
 
 **Total SP: 12**
+
+**Implementasi (2026-10-19):** T-089–T-095 tersedia pada halaman detail pengguna.
+Ban wajib alasan 1–500 karakter, tersimpan dan tampil di profil. Unban memulihkan
+status active/trial sebelumnya; ban lama tanpa snapshot kembali ke active.
+Soft delete memerlukan konfirmasi email yang cocok di browser serta database,
+mengisi deleted_at dan mempertahankan histori keuangan. Hard delete users oleh
+authenticated dicabut. ConfirmDialog reusable dan Sonner menangani konfirmasi,
+pending, sukses, serta error/retry. Setelah delete berhasil, kembali ke daftar.
+
+RPC manage_user memeriksa admin aktif dan scope assignment Operator, mengunci
+baris, serta menjalankan mutasi dan audit before/after secara atomik. Finance,
+anonim, non-admin, akun nonaktif, serta produk di luar scope ditolak. Tidak
+memakai service role. Reset mencatat permintaan audit dan membatasi permintaan
+per user selama 60 detik, termasuk lintas admin. Client Auth terpisah memakai
+implicit recovery tanpa mengubah cookie sesi admin.
+
+Migration 20261019000900 diterapkan ke cloud; tipe resmi diperbarui. Reset
+mengasumsikan akun produk terdaftar di Supabase Auth project yang sama. URL
+produk harus diizinkan sebagai redirect; aplikasi produk harus menangani
+PASSWORD_RECOVERY/updateUser. Sukses berarti permintaan diterima, bukan bukti
+email terkirim. Integrasi produk wajib menegakkan status banned/deleted saat
+login; perubahan status dashboard tidak otomatis mencabut sesi Auth produk.
+
+Verifikasi: seluruh 88 tes regresi lulus, meliputi validasi, role/scope,
+status trial, audit, soft delete dengan histori tetap tersimpan, throttle,
+serta isolasi client recovery. Typecheck, lint file story, dan build produksi
+lulus. Browser admin cloud memakai fixture lokal sementara untuk Ban wajib
+alasan, error server/toast, konfirmasi email salah/benar, Escape/cancel, serta
+dialog reset. Fixture dihapus; tidak mengubah akun bisnis atau mengirim email
+nyata. Audit aksesibilitas dialog: 0 pelanggaran, 2 pemeriksaan manual (focus
+guard Radix dan kontras glass). Reset email end-to-end serta review visual
+pengguna masih perlu diverifikasi.
+
+**Pending E2E manual test — STORY-016 (2026-10-19):**
+- [ ] Gunakan akun uji MicroSaaS pada Supabase Auth project yang sama dan pastikan URL produk masuk Auth Redirect URLs.
+- [ ] Picu Reset password dari detail pengguna; verifikasi email benar-benar diterima dan tautannya membuka produk yang tepat.
+- [ ] Selesaikan PASSWORD_RECOVERY, simpan password baru, lalu pastikan login berhasil dengan password baru dan password lama ditolak.
+- [ ] Pastikan sesi admin dashboard tetap aktif dan identitas admin tidak berubah selama proses reset pengguna.
+- [ ] Verifikasi retry/error pengiriman dan jeda permintaan 60 detik; catat hasil serta tanggal pengujian sebelum menutup pending ini.
 
 ---
 
